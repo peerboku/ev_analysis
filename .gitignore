@@ -5,3 +5,8 @@ __pycache__/
 outputs/
 data/raw/
 data/processed/
+Sources/
+Handoff_prompt_master.md
+plotting_cleanup_prompt.md
+short_prompt.md
+data/
