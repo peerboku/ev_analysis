@@ -95,7 +95,10 @@ def find_download_links(html: str, base_url: str) -> list[CandidateLink]:
     candidates: list[CandidateLink] = []
 
     for link in soup.find_all("a", href=True):
-        href = link["href"].strip()
+        href = link["href"]
+        if isinstance(href, list):
+            href = href[0] if href else ""
+        href = href.strip()
         absolute_url = urljoin(base_url, href)
 
         if not has_allowed_extension(absolute_url):
