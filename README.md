@@ -144,6 +144,12 @@ See [Roadmap.md](Roadmap.md) for the full task list and open decisions.
 
 ---
 
+## License
+
+[MIT](LICENSE)
+
+---
+
 ## Author
 
 Peer Szczepaniak — student, Universität für Bodenkultur Wien (BOKU)
