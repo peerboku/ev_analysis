@@ -6,8 +6,8 @@ PROCESSED_DIR = Path("data/processed")
 FINAL_FILE = Path("data/final/ev_registrations_monthly_clean.csv")
 
 ########
-# Mapping/Definition
-########   
+# Column definitions
+########
 
 EV_COLUMNS = [
     "Elektro",
@@ -23,14 +23,16 @@ HYBRID_COLUMNS = [
     "Diesel/Elektro (hybrid)",
 ]
 
-# Total is derived dynamically — all columns except these are fuel types
+# Total is derived dynamically — every column except these is a fuel type
 NON_FUEL_COLS = {"Bundesland", "Fahrzeugklasse", "Datum", "source_file"}
 
-#######
-# Choose Files to combine1
-######
 
 def main():
+
+    ########
+    # Load and combine all processed files
+    ########
+
     csv_files = sorted(PROCESSED_DIR.glob("*.csv"))
 
     if not csv_files:
@@ -49,55 +51,45 @@ def main():
 
     combined = pd.concat(dataframes, ignore_index=True, sort=False)
     print(f"Combined shape: {combined.shape}")
+    print()
 
-if __name__ == "__main__":
-    main()
+    ########
+    # Filter to Austria PKW only
+    ########
 
+    df_pkw = combined[
+        (combined["Bundesland"] == "Österreich") &
+        (combined["Fahrzeugklasse"] == "Personenkraftwagen Klasse M1")
+    ].copy()
 
-df = pd.read_csv(OUTPUT_FILE)
+    df_pkw["Datum"] = pd.to_datetime(df_pkw["Datum"], errors="raise")
 
+    # Derive fuel_cols before adding any new columns — everything that isn't
+    # metadata is a fuel type at this point
+    fuel_cols = [c for c in df_pkw.columns if c not in NON_FUEL_COLS]
 
-df_PKW = df[
-    (df["Bundesland"] == "Österreich") &
-    (df["Fahrzeugklasse"] == "Personenkraftwagen Klasse M1")
-]
+    df_pkw["month"] = df_pkw["Datum"].dt.to_period("M").astype(str)
 
-df_PKW["Datum"] = pd.to_datetime(df_PKW["Datum"], errors="raise")
-df_PKW["month"] = df_PKW["Datum"].dt.to_period("M").astype(str)
+    ########
+    # Calculate registration counts and shares
+    # axis = 1 means sum across columns in our case fuel types
+    # min_count=1 means that if all fuel type columns are NaN for a row, the result will be NaN instead of 0, which is more accurate for missing data
+    ########
 
-df_PKW["total_new_registrations"] = df_PKW[ALL_COLUMNS].sum(axis=1)
-df_PKW["electric_new_registrations"] = df_PKW[EV_COLUMNS].sum(axis=1)
-df_PKW["hybrid_new_registrations"] = df_PKW[HYBRID_COLUMNS].sum(axis=1)
-df_PKW["emission_free_registrations"] = df_PKW[EMISSION_FREE_COLUMNS].sum(axis=1)
+    df_pkw["total_new_registrations"]     = df_pkw[fuel_cols].sum(axis=1, min_count=1)
+    df_pkw["electric_new_registrations"]  = df_pkw[EV_COLUMNS].sum(axis=1, min_count=1)
+    df_pkw["hybrid_new_registrations"]    = df_pkw[HYBRID_COLUMNS].sum(axis=1, min_count=1)
+    df_pkw["emission_free_registrations"] = df_pkw[EMISSION_FREE_COLUMNS].sum(axis=1, min_count=1)
 
-# EV SHARE
-df_PKW["ev_share"] = (
-    df_PKW["electric_new_registrations"]
-    / df_PKW["total_new_registrations"]
-)
+    df_pkw["ev_share"]            = df_pkw["electric_new_registrations"]  / df_pkw["total_new_registrations"]
+    df_pkw["hybrid_share"]        = df_pkw["hybrid_new_registrations"]    / df_pkw["total_new_registrations"]
+    df_pkw["emission_free_share"] = df_pkw["emission_free_registrations"] / df_pkw["total_new_registrations"]
 
-# EV + HYBRID SHARE
-df_PKW["hybrid_share"] = (   
-    df_PKW["hybrid_new_registrations"]
-    / df_PKW["total_new_registrations"]
-)
+    ########
+    # Build and save final CSV
+    ########
 
-df_PKW["emission_free_share"] = (
-    df_PKW["emission_free_registrations"]
-    / df_PKW["total_new_registrations"]
-)
-
-#########
-#Create Final df
-#########
-
-final_df = df_PKW.copy()
-
-final_df["month"] = pd.to_datetime(final_df["Datum"]).dt.to_period("M").astype(str)
-
-
-final_df = final_df[
-    [
+    final_df = df_pkw[[
         "month",
         "total_new_registrations",
         "electric_new_registrations",
@@ -107,43 +99,16 @@ final_df = final_df[
         "hybrid_share",
         "emission_free_share",
         "source_file",
-    ]
-]
+    ]].sort_values("month").reset_index(drop=True)
 
-final_df = final_df.sort_values("month")
-
-# If the final master file already exists, add only new months.
-# Existing rows stay unchanged.
-if FINAL_FILE.exists():
-    existing_df = pd.read_csv(FINAL_FILE)
-
-    existing_months = set(existing_df["month"].astype(str))
-
-    final_df = final_df[
-        ~final_df["month"].astype(str).isin(existing_months)
-    ].copy()
-
-    if final_df.empty:
-        print("No new months to add.")
-        print("Final file was not changed.")
-    else:
-        updated_df = pd.concat([existing_df, final_df], ignore_index=True)
-        updated_df = updated_df.sort_values("month")
-
-        updated_df.to_csv(FINAL_FILE, index=False)
-
-        print("Added new rows to final file:")
-        print(FINAL_FILE)
-        print("Rows added:", len(final_df))
-        print("New shape:", updated_df.shape)
-        print(updated_df.tail(12))
-        print(updated_df.dtypes)
-
-else:
     FINAL_FILE.parent.mkdir(parents=True, exist_ok=True)
     final_df.to_csv(FINAL_FILE, index=False)
 
-    print("Created final file:")
-    print(FINAL_FILE)
-    print(final_df)
-    print(final_df.dtypes)
+    print(f"Saved: {FINAL_FILE}")
+    print(f"Rows: {len(final_df)}  ({final_df['month'].min()} – {final_df['month'].max()})")
+    print()
+    print(final_df.tail(5).to_string())
+
+
+if __name__ == "__main__":
+    main()
