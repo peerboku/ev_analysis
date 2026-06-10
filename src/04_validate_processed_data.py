@@ -101,6 +101,21 @@ def check_no_missing_values(df):
     return True
 
 
+def check_counts_within_total(df):
+    violations = {}
+    for col in ["electric_new_registrations", "hybrid_new_registrations", "emission_free_registrations"]:
+        bad = df[df[col] > df["total_new_registrations"]]["month"].tolist()
+        if bad:
+            violations[col] = bad
+    if violations:
+        fail("Registration counts exceed total:")
+        for col, months in violations.items():
+            indent(f"{col} > total at: {months}")
+        return False
+    ok("All registration counts within total")
+    return True
+
+
 def check_share_ranges(df):
     out_of_range = {}
     for col in SHARE_COLUMNS:
@@ -186,6 +201,7 @@ def main():
     results.append(check_no_duplicates(df))
     results.append(check_no_gaps(df))
     results.append(check_no_missing_values(df))
+    results.append(check_counts_within_total(df))
     results.append(check_share_ranges(df))
     results.append(check_share_formula(df, "ev_share",            "electric_new_registrations"))
     results.append(check_share_formula(df, "emission_free_share", "emission_free_registrations"))
