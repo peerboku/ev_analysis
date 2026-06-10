@@ -3,8 +3,7 @@ import pandas as pd
 
 
 PROCESSED_DIR = Path("data/processed")
-OUTPUT_FILE = Path("data/processed/ev_registrations_monthly_combined.csv")
-FINAL_FILE = Path("data/final/ev_registrations_monthly_clean_v.2.0.csv")
+FINAL_FILE = Path("data/final/ev_registrations_monthly_clean.csv")
 
 ########
 # Mapping/Definition
@@ -42,52 +41,24 @@ HYBRID_COLUMNS = [
 ######
 
 def main():
-    csv_files = sorted(
-        file for file in PROCESSED_DIR.glob("*.csv")
-        if file.name != OUTPUT_FILE.name
-    )
+    csv_files = sorted(PROCESSED_DIR.glob("*.csv"))
 
     if not csv_files:
-        raise FileNotFoundError("No CSV files found in data/processed/")
+        raise FileNotFoundError(f"No CSV files found in {PROCESSED_DIR}")
 
-    print(f"Found {len(csv_files)} CSV files:")
-    for i, file in enumerate(csv_files):
-        print(f"{i}: {file.name}")
-
-    # Allow user to choose which files to use
-    selected_indices = input("Enter the indices of the files to combine (comma-separated, e.g., 0,1,2): ")
-    selected_indices = [int(x.strip()) for x in selected_indices.split(',') if x.strip().isdigit()]
-    selected_files = [csv_files[i] for i in selected_indices if i < len(csv_files)]
-
-    if not selected_files:
-        print("No valid files selected.")
-        return
-
-    print(f"Selected {len(selected_files)} files:")
-    for file in selected_files:
-        print(f"- {file.name}")
+    print(f"Found {len(csv_files)} files in {PROCESSED_DIR}:")
+    for f in csv_files:
+        print(f"  - {f.name}")
+    print()
 
     dataframes = []
-
-    for file in selected_files:
-        df = pd.read_csv(file)
-
-        # Keep track of the original file
-        df["source_file"] = file.name
-
+    for f in csv_files:
+        df = pd.read_csv(f)
+        df["source_file"] = f.name
         dataframes.append(df)
 
     combined = pd.concat(dataframes, ignore_index=True, sort=False)
-
-    combined.to_csv(OUTPUT_FILE, index=False)
-
-    print()
-    print(f"Saved combined file to: {OUTPUT_FILE}")
     print(f"Combined shape: {combined.shape}")
-    print()
-    print("Columns:")
-    for col in combined.columns:
-        print(f"- {col}")
 
 if __name__ == "__main__":
     main()
