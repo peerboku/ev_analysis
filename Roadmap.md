@@ -14,17 +14,18 @@
 
 | Area | Status |
 |---|---|
-| Raw data download script | ✅ Working (`scripts/01_download_data.py`) |
-| Raw data processing (.ods → processed CSV) | ✅ Working (`scripts/02_process_raw_data.py`) |
-| Data combination (processed → final CSV) | ✅ Working (`scripts/03_combine_data.py`) |
+| Historical data processing (one-time) | ✅ Working (`src/00_process_historical_data.py`) |
+| Raw data download script | ✅ Working (`src/01_download_data.py`) |
+| Raw data processing (.ods → processed CSV) | ✅ Working (`src/02_process_raw_data.py`) |
+| Data combination (processed → final CSV) | ✅ Working (`src/03_combine_data.py`) |
+| Data validation + confirmation prompt | ✅ Working (`src/04_validate_processed_data.py`) |
 | Final CSV schema (8 columns) | ✅ Stable |
-| Data coverage | ✅ 2019-01 to 2026-03 (86 months) |
+| Data coverage | ✅ 2019-01 to 2026-05 (89 months) |
 | Klimadashboard-style plot | ✅ Working in notebook |
-| Chart PNG export | ✅ `outputs/klimadashboard.png` |
-| Validation script | 🟡 Needs update for 8-column schema |
+| Chart PNG export | ✅ `outputs/klimadashboard_v.2.1.png` |
 | Standalone plot script | 🔴 Not extracted from notebook |
 | Chart spec documentation | 🔴 Not written |
-| Repo structure / cleanup | 🔴 In progress |
+| Repo structure / cleanup | 🟡 In progress |
 | `main.py` run-all pipeline | ⬜ Not started |
 | GitHub Actions automation | ⬜ Planned (post-deadline) |
 | Monthly scheduling | ⬜ Planned (post-deadline) |
@@ -57,11 +58,9 @@
   - `04_validate_processed_data.py` → keep (fix schema, see Priority 2)
   - `05_plot_ev_share.py` → extract from notebook (see Priority 2)
 
-- [ ] **Remove version suffixes from all filenames**
-  - `ev_registrations_monthly_clean_v.2.0.csv` → `ev_registrations_monthly_clean.csv`
-  - `klimadashboard_v.2.1.png` → `klimadashboard.png`
-  - Notebook: `plot_klimadashboard_v.2.0.ipynb` → `plot_klimadashboard.ipynb`
-  - Update all internal references
+- [x] **Remove version suffixes from all filenames**
+  - `ev_registrations_monthly_clean_v.2.0.csv` → `ev_registrations_monthly_clean.csv` ✓
+  - Notebook and PNG still use version suffix — clean up in next pass
 
 - [ ] **Reorganize folder structure**
   ```
@@ -90,8 +89,8 @@
 
 ### Priority 2 — Pipeline integrity
 
-- [ ] **Update `scripts/04_validate_processed_data.py`** for 8-column schema  
-  Checks: column presence, YYYY-MM format, no duplicate months, shares in 0–1 range, `ev_share = electric / total`, chronological order.
+- [x] **Update `src/04_validate_processed_data.py`** for 8-column schema  
+  11 checks: column presence, YYYY-MM format, no duplicates, no gaps, no missing values, counts within total, shares in 0–1, formula checks, chronological order. Summary table + manual confirmation prompt.
 
 - [ ] **Extract plot → `scripts/05_plot_ev_share.py`**  
   Clean standalone script. German labels. No blinking marker. Export PNG to `outputs/`.  

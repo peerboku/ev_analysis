@@ -8,7 +8,8 @@ A reproducible Python pipeline for tracking the share of emission-free vehicles 
 
 - **Downloads** the latest new-registration data (.ods) automatically from [Statistik Austria](https://www.statistik.at/statistiken/tourismus-und-verkehr/fahrzeuge/kfz-neuzulassungen)
 - **Processes** raw files into clean monthly CSVs (by fuel type: electric, hybrid, fossil, etc.)
-- **Combines** annual and monthly datasets into a single master CSV
+- **Combines** all processed files into a single validated master CSV
+- **Validates** the final dataset with 11 automated checks before graph creation
 - **Visualizes** the emission-free vehicle share over time as a Klimadashboard-style chart
 
 ![Klimadashboard EV share chart](outputs/klimadashboard_v.2.1.png)
@@ -41,33 +42,29 @@ All data points are monthly observations. Data is plotted at the approximate mid
 ev_analysis/
 ├── data/
 │   ├── raw/            # Downloaded .ods / .xlsx files from Statistik Austria
-│   ├── processed/      # Per-year cleaned CSVs
-│   ├── final/          # Master CSV (ev_registrations_monthly_clean_v.2.0.csv)
+│   ├── processed/      # Per-month cleaned CSVs (gitignored)
+│   ├── final/          # Master CSV (gitignored)
 │   └── media/          # Car icon used in the chart
 ├── notebooks/
-│   ├── plot_klimadashboard_v.2.0.ipynb   # Main visualization notebook
-│   ├── process_data.ipynb                # Data processing exploration
-│   ├── process_historical_data.ipynb     # Historical data reconstruction
-│   └── combine_processed_files.ipynb     # Combining processed files
+│   └── plot_klimadashboard_v.2.0.ipynb   # Visualization notebook (exploratory)
 ├── src/
-│   ├── inspect_raw_data.py               # Inspect raw .ods / .xlsx structure
-│   ├── 01_download_data.py               # Auto-download from Statistik Austria
-│   ├── 02_process_raw_data.py            # Clean raw → processed CSV
-│   ├── 03_combine_data.py                # Combine → final CSV
-│   ├── 04_validate_processed_data.py     # Data validation
-│   └── process_historical_data2.py       # One-time historical normalization
-├── Sources/                              # Reference documents (policy targets etc.)
+│   ├── 00_process_historical_data.py     # One-time: process historical xlsx → standard format
+│   ├── 01_download_data.py               # Auto-download latest .ods from Statistik Austria
+│   ├── 02_process_raw_data.py            # Process all month sheets → per-month CSVs
+│   ├── 03_combine_data.py                # Combine all processed CSVs → final master CSV
+│   ├── 04_validate_processed_data.py     # Validate final CSV + manual confirmation prompt
+│   └── inspect_raw_data.py              # Interactive tool to inspect raw file structure
 ├── outputs/                              # Exported chart images (PNG)
 ├── requirements.txt
-└── Roadmap.md                            # Project status and open tasks
+└── Roadmap.md
 ```
 
 ---
 
 ## Final CSV schema
 
-Master file: `data/final/ev_registrations_monthly_clean_v.2.0.csv`  
-Coverage: **2019-01 to 2026-03** (86 months, fully monthly)
+Master file: `data/final/ev_registrations_monthly_clean.csv`  
+Coverage: **2019-01 to 2026-05** (89 months, fully monthly)
 
 | Column | Description |
 |---|---|
@@ -97,17 +94,23 @@ pip install -r requirements.txt
 
 ## Running the pipeline
 
+**First time only** — process the historical 2019–2025 dataset:
+```bash
+python src/00_process_historical_data.py
+```
+
+**Monthly update:**
 ```bash
 # 1. Download the latest raw data from Statistik Austria
 python src/01_download_data.py
 
-# 2. Process raw .ods file → cleaned CSV
+# 2. Process all month sheets from the downloaded file → per-month CSVs
 python src/02_process_raw_data.py
 
-# 3. Combine processed files → final master CSV
+# 3. Combine all processed files → final master CSV
 python src/03_combine_data.py
 
-# 4. Validate final CSV
+# 4. Validate final CSV — reviews data and asks for confirmation before plotting
 python src/04_validate_processed_data.py
 ```
 
@@ -138,20 +141,20 @@ The chart uses a Klimadashboard-inspired dark theme:
 
 | Component | Status |
 |---|---|
+| Historical data processing (one-time) | ✅ Working |
 | Download script | ✅ Working |
 | Raw data processing | ✅ Working |
 | Data combination | ✅ Working |
-| Data coverage (2019-01 – 2026-03) | ✅ Complete |
+| Data validation + confirmation prompt | ✅ Working |
+| Data coverage (2019-01 – 2026-05) | ✅ Complete |
 | Klimadashboard-style plot (notebook) | ✅ Working |
 | Chart PNG export | ✅ `outputs/klimadashboard_v.2.1.png` |
-| Validation script | 🟡 Needs schema update (8-column) |
 | Standalone plot script | 🔴 Not extracted from notebook yet |
-| Chart spec documentation | 🔴 Not written |
-| Run-all pipeline script | ⬜ Planned |
+| Run-all pipeline script (`main.py`) | ⬜ Planned |
 | Monthly automation | ⬜ Planned |
 | Bundesländer analysis | ⬜ Planned |
 
-See [Roadmap.md](Roadmap.md) for the full task list and open decisions.
+See [Roadmap.md](Roadmap.md) for the full task list.
 
 ---
 
