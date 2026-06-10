@@ -1,11 +1,11 @@
-# ev_analysis — Project Plan
+# ev_analysis — Project Roadmap
 
 **Goal:** Reproducible Python pipeline + Klimadashboard-style visualization of Austrian EV share among new car registrations (Statistik Austria data).
 
 **Project location:** `~/python-projects/ev_analysis`  
 **Startup:** `cd ~/python-projects/ev_analysis && source .venv/bin/activate && code .`  
-**Master data file:** `data/final/ev_registrations_monthly_clean.csv`  
-**Last updated:** 2026-05-11
+**Master data file:** `data/final/ev_registrations_monthly_clean_v.2.0.csv`  
+**Last updated:** 2026-06-10
 
 ---
 
@@ -13,213 +13,113 @@
 
 | Area | Status |
 |---|---|
-| Raw data processing (.ods → processed CSV) | ✅ Working |
-| Data combination (processed → final CSV) | ✅ Working |
-| Final CSV schema (7 columns) | ✅ Stable |
-| Klimadashboard-style plot | 🟡 Working in notebook only (`notebooks/plot_advanced.ipynb`) |
-| Validation script | 🔴 Outdated (5-column schema, needs update) |
-| Plot script | 🔴 Not extracted from notebook yet |
-| Automation / monthly update | ⬜ Not started |
+| Raw data download script | ✅ Working (`src/01_download_data.py`) |
+| Raw data processing (.ods → processed CSV) | ✅ Working (`src/02_process_raw_data.py`) |
+| Data combination (processed → final CSV) | ✅ Working (`src/03_combine_data.py`) |
+| Final CSV schema (8 columns) | ✅ Stable |
+| Data coverage | ✅ 2019-01 to 2026-03 (86 months) |
+| Klimadashboard-style plot | ✅ Working in notebook (`notebooks/plot_klimadashboard_v.2.0.ipynb`) |
+| Chart PNG export | ✅ `outputs/klimadashboard_v.2.1.png` |
+| Validation script | 🟡 Exists but needs update for 8-column schema |
+| Standalone plot script | 🔴 Not extracted from notebook |
+| Chart spec documentation | 🔴 Not written |
+| Run-all pipeline script | ⬜ Not started |
+| Monthly automation | ⬜ Not started |
 | Bundesländer analysis | ⬜ Not started |
 
 ---
 
-## Open Decisions (resolve before publishing)
+## Resolved Decisions
 
-These are blockers for any final/public claims. Do not finalize the chart until these are resolved.
+1. **Kfz vs Pkw denominator** — Using PKW data only for final CSV and plot. Raw/processed files contain KFZ data as-is.
+2. **EV definition** — "Emission-free" = Elektro + Wasserstoff. Tracked as `emission_free_share` in the plot. "Elektro only" kept as `ev_share` for reference.
+3. **Hydrogen classification** — "Wasserstoff/Brennstoffzelle" is NOT hybrid. It is counted in `emission_free_registrations`.
+4. **Policy target source** — Österreichischer Mobilitätsmasterplan 2030. Document in `Sources/`.
+5. **Historical data access** — Monthly data 2019–2025 obtained and processed. All data is now fully monthly.
+6. **Klimadashboard contact** — Reached out, no reply yet.
 
-
-### Solved Decisions
-
-1. **Kfz vs Pkw denominator**: We only work with PKW data for the final csv and the plot. But the raw and processed files contain data from KFZ. 
-2. **EV definition** — EV is only Elektro but we will work with emission free cars for the final csv and plot that means it will contain ELektro and Wasserstoff. Title needs to be changed in the plot. 
-3. **Hydrogen classification** — "Wasserstoff(Brennstoffzelle)" is not part of Hybrid. But it will pe part of the emission free cars.
-4. **Policy target source** — Source for policy target is found and documented.
-5. **Statistik Austria data access** — Monthly 2019-2025 data has been added to the plot. The plot nopw only contains monthly observed data.
 ---
 
 ## Task List
 
-### Priority 1 — Pipeline integrity (do these before anything else)
+### Priority 1 — Pipeline integrity
 
-- [ ] **Update `src/validate_processed_data.py`** for 7-column schema  
-  Current schema: `month, total_new_registrations, electric_new_registrations, ev_share, source_file`  
-  Target schema: `month, total_new_registrations, electric_new_registrations, hybrid_new_registrations, ev_share, hybrid_share, source_file`  
-  → See Claude Code handoff below
+- [ ] **Update `src/04_validate_processed_data.py`** for 8-column schema  
+  Current schema: `month, total, electric, hybrid, emission_free, ev_share, hybrid_share, emission_free_share, source_file`  
+  Checks needed: column presence, YYYY-MM format, no duplicate months, numeric ranges (shares 0–1), derived column consistency (`ev_share = electric / total`), chronological order.
 
-- [ ] **Extract plot code from `notebooks/plot_advanced.ipynb` → `src/plot_ev_share_klimadashboard.py`**  
-  Stable, runnable script. No blinking marker. Remove ipywidgets (or keep as optional). Export PNG + SVG.  
-  → See Claude Code handoff below
+- [ ] **Extract plot code from notebook → `src/05_plot_ev_share.py`**  
+  Clean, runnable script. No blinking marker. German labels. Export PNG to `outputs/`.  
+  Key rules: monthly line for all data, policy target dashed line, trend line optional, static label for latest point.
 
-- [ ] **Remove blinking marker from notebook** (quick fix, do alongside extraction)
+### Priority 2 — Documentation & presentation
 
-### Priority 2 — Documentation
+- [ ] **Write `docs/chart_spec.md`** (internal spec)  
+  Cover: data file, schema, EV/emission-free definitions, policy target source, colors, fonts, axis logic, export sizes, known limitations.
 
-- [ ] **Write `docs/ev_share_chart_spec.md`**  
-  Contents: data file, source, schema, historical-vs-observed rule, Kfz/Pkw status, EV definition status, policy target status, colors, fonts, axis logic, labels, export sizes, known limitations.
+- [ ] **Update README** methodological note if anything changes in definitions or coverage.
 
-- [ ] **Update README.md** with methodological note:  
-  Pre-2026 data = historical estimate (yearly points). 2026+ = observed monthly data.
+### Priority 3 — Pipeline usability
 
-### Priority 3 — Open decisions / research
+- [ ] **Build `src/run_pipeline.py`**  
+  One command to run: download → process → combine → validate → plot.
 
-- [x] **Clarify Kfz vs Pkw denominator** — check raw files and pick one, document the choice
-- [x] **Verify EV/hydrogen/hybrid definitions** against raw source columns
-- [x] **Find official source for 100% EV by 2030 policy target**
-- [x] **Follow up with Statistik Austria** on monthly 2019–2025 data access
-- [] **Follow up with Klimadashboard** (no reply yet)
+- [ ] **Add `period_type` column** to final CSV (`observed_monthly` for all current data — historical estimates were replaced with real monthly data).
 
-### Priority 4 — Future (do not start until Priority 1–2 are done)
+### Priority 4 — Future (after presentation)
 
-- [ ] Add `period_type` column to final CSV (`annual_estimate` / `h1_estimate` / `observed_monthly`)
-- [ ] Build `src/run_pipeline.py` (download → process → combine → validate → plot)
-- [ ] Build `src/download_latest_data.py`
 - [ ] Monthly scheduling via launchd
 - [ ] Bundesländer analysis (long format, one row per month × Bundesland)
-
----
-
-## Claude Code Handoff Snippets
-
-Copy-paste these as context when opening a Claude Code session for a specific task.
-
----
-
-### Handoff A — Fix validation script
-
-```
-Project: ev_analysis (~/python-projects/ev_analysis)
-Task: Update src/validate_processed_data.py for current 7-column schema.
-
-Current final CSV: data/final/ev_registrations_monthly_clean.csv
-Schema: month, total_new_registrations, electric_new_registrations, hybrid_new_registrations, ev_share, hybrid_share, source_file
-
-The script was written for an older 5-column schema. Update it to:
-- Check all 7 required columns are present
-- Parse month as YYYY-MM, flag bad formats
-- Check for duplicate months (do not silently fix — print source_file for investigation)
-- Check for missing values in required numeric columns
-- Check ev_share = electric / total (within small tolerance)
-- Check hybrid_share = hybrid / total where available
-- Check ev_share and hybrid_share are in range 0–1
-- Check chronological sorting
-- Check no extra helper columns in output
-- Fail loudly on structural/data errors
-- Save clean output
-
-Do not silently fix duplicate months. Print source_file for each duplicate so we can investigate.
-```
-
----
-
-### Handoff B — Extract plot to script
-
-```
-Project: ev_analysis (~/python-projects/ev_analysis)
-Task: Move stable plot code from notebooks/plot_advanced.ipynb into src/plot_ev_share_klimadashboard.py
-
-The notebook has a working Klimadashboard-style EV share plot. Extract it into a clean, runnable script.
-
-Key rules:
-- Pre-2026 data: plot as yearly markers only (not monthly line) — data is historical estimates
-- 2026+ data: plot as observed monthly line, no markers, midpoints at ~mid-month
-- Policy path: dashed line from 2021 baseline EV share to 100% at 2030-12-31. Label: "100 % Elektrofahrzeug-Anteil bis 2030". This is provisional — add a comment noting the source needs verification.
-- No blinking marker — use a static label for the latest observed point
-- German labels only
-- Export PNG + SVG to outputs/
-
-Style constants (Klimadashboard):
-KD_BG = "#18181B"
-KD_PANEL = "#27272A"
-KD_GRID = "#71717B"
-KD_TEXT = "#F4F4F5"
-KD_MUTED = "#9F9FA9"
-EV_COLOR = "#F5AF4A"
-
-Read data from: data/final/ev_registrations_monthly_clean.csv
-Car icon: data/car.png
-
-Make it importable and runnable from the command line: python src/plot_ev_share_klimadashboard.py
-```
-
----
-
-### Handoff C — Write chart spec doc
-
-```
-Project: ev_analysis (~/python-projects/ev_analysis)
-Task: Create docs/ev_share_chart_spec.md
-
-This is a specification document for the EV share chart. It should cover:
-- Data file used and source
-- Final CSV schema
-- Scientific rule: pre-2026 = historical estimates (yearly points only), 2026+ = observed monthly
-- Kfz vs Pkw denominator status (UNRESOLVED — document both values for H1 2023)
-- EV definition: currently "Elektro" only, hydrogen unclassified, hybrid = Benzin/Elektro + Diesel/Elektro
-- Policy target: 100% EV by 2030 (provisional, source needed)
-- Colors, fonts (Barlow), axis logic
-- German-only labels
-- Export sizes (300 dpi PNG + SVG)
-- Known limitations
-
-Write in German or English — the spec is for internal/handoff use.
-```
+- [ ] Potentially hand off visualization to Klimadashboard.at
 
 ---
 
 ## Key Technical Reference
 
-**Final CSV schema:**
+**Final CSV schema (8 columns):**
 ```
 month (YYYY-MM)
 total_new_registrations
 electric_new_registrations
 hybrid_new_registrations
+emission_free_registrations
 ev_share
 hybrid_share
+emission_free_share
 source_file
 ```
 
-**Fuel groups (current/provisional):**
+**Fuel groups:**
 ```python
-EV_COLUMNS     = ["Elektro"]
-HYBRID_COLUMNS = ["Benzin/Elektro (hybrid)", "Diesel/Elektro (hybrid)"]
-FOSSIL_COLUMNS = ["Benzin", "Diesel", "Flüssiggas", "Erdgas",
-                  "Benzin/Flüssiggas (bivalent)", "Benzin/Erdgas (bivalent)",
-                  "Benzin inkl.Flex-Fuel"]
-# "Wasserstoff(Brennstoffzelle)" — unclassified, do not add to hybrid
+EV_COLUMNS           = ["Elektro"]
+HYBRID_COLUMNS       = ["Benzin/Elektro (hybrid)", "Diesel/Elektro (hybrid)"]
+EMISSION_FREE        = ["Elektro", "Wasserstoff(Brennstoffzelle)"]
+FOSSIL_COLUMNS       = ["Benzin", "Diesel", "Flüssiggas", "Erdgas",
+                        "Benzin/Flüssiggas (bivalent)", "Benzin/Erdgas (bivalent)",
+                        "Benzin inkl.Flex-Fuel"]
 ```
 
-**Austria filter in processed files:**
+**Austria filter:**
 ```python
 df[df["Bundesland"] == "Österreich"]
-# Fahrzeugklasse: inspect with df["Fahrzeugklasse"].unique() — may be "All" or "Gesamt"
 ```
 
-**Plotting rule:**
-- Pre-2026 → aggregate to yearly, plot as scatter markers
-- 2026+ → observed monthly line, midpoint = ~14th of month
-- Policy path → straight line from 2021 EV share to 1.0 at 2030-12-31, dashed, same color as EV line, lower opacity
-
-**Known H1 2023 values (for cross-checking):**
-- Pkw only: total = 126,690 | electric = 23,372 | EV share = 18.45%
-- Kfz total: total = 183,190 | electric = 26,517 | EV share = 14.48%
-
-**Style constants:**
+**Style constants (Klimadashboard):**
 ```python
-KD_BG = "#18181B"
+KD_BG    = "#18181B"
 KD_PANEL = "#27272A"
-KD_GRID = "#71717B"
-KD_TEXT = "#F4F4F5"
+KD_GRID  = "#71717B"
+KD_TEXT  = "#F4F4F5"
 KD_MUTED = "#9F9FA9"
 EV_COLOR = "#F5AF4A"  # mobility orange
 ```
+
+**Policy target:** straight line from 2021 emission-free share → 1.0 at 2030-12-31, dashed, same color as EV line at lower opacity.
 
 ---
 
 ## How to Use This File
 
-1. **Check status table** at the top to know where things stand
-2. **Pick the next task** from the priority list
-3. **Copy the relevant handoff snippet** and paste it at the start of a Claude Code session (`claude` in terminal) or new chat
-4. **Come back here** when done and tick off the task + update status table
+1. Check the **Status table** to know where things stand.
+2. Pick the next task from the **priority list**.
+3. Come back here when done — tick off the task and update the status table.
