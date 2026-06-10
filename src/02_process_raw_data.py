@@ -1,55 +1,11 @@
 from pathlib import Path
+import re
 import pandas as pd
 
-#########
-# LOAD RAW DATA
-########
-
 RAW_DIR = Path("data/raw")
+PROCESSED_DIR = Path("data/processed")
 
-files = list(RAW_DIR.glob("*.ods")) #looks for files 
-
-# Checks and prints out existing files 
-files = sorted(RAW_DIR.glob("*.ods"))
-
-print()
-print("ODS files found:")
-for i, file in enumerate(files):
-    print(f"{i}: {file}")
-
-if not files:
-    raise FileNotFoundError(f"No .ods files found in {RAW_DIR}")
-print()
-
-# Selects first raw file, can be changed later
-file_path = files[1]
-
-print("Selected file:")
-print(file_path)
-print("Suffix:", file_path.suffix)
-print()
-
-ods_file = pd.ExcelFile(file_path, engine="odf")
-
-# Selects the sheet with the table you want to work with
-sheet_name = ods_file.sheet_names[3] 
-
-df = pd.read_excel(
-    file_path,
-    sheet_name=sheet_name,
-    header=None,
-    engine="odf"
-)
-
-print("Selected sheet:", sheet_name)
-print("Shape:", df.shape)
-print()
-
-########
-# PROCESS DATA to clean csv
-########
-
-bundeslaender = [
+BUNDESLAENDER = [
     "Österreich",
     "Burgenland",
     "Kärnten",
@@ -62,95 +18,140 @@ bundeslaender = [
     "Wien",
 ]
 
-# rename first column
-df = df.rename(columns={df.columns[0]: "Bezeichnung"})
-df["Bezeichnung"] = df["Bezeichnung"].astype(str).str.strip()
 
-# Rename Kraftstoff columns
-fuel_cols = df.iloc[1, 1:].tolist()
-df.columns = ["Bezeichnung"] + fuel_cols
+def process_sheet(df, year, month_number):
+    """
+    Takes a raw sheet dataframe and returns a clean processed dataframe.
+    The sheet structure from Statistik Austria looks like:
+      row 0: title row (ignored)
+      row 1: fuel type headers
+      row 2+: data rows, grouped by Bundesland
+    """
+    # First column is the label column (Bundesland name or vehicle class name)
+    df = df.rename(columns={df.columns[0]: "Bezeichnung"})
+    df["Bezeichnung"] = df["Bezeichnung"].astype(str).str.strip()
 
-# detect Bundesland rows
-df["Bundesland"] = df["Bezeichnung"].where(df["Bezeichnung"].isin(bundeslaender))
-df["Bundesland"] = df["Bundesland"].ffill()
+    # Row 1 contains the fuel type column headers — use these as column names
+    fuel_cols = df.iloc[1, 1:].tolist()
+    df.columns = ["Bezeichnung"] + fuel_cols
 
-# remove rows before the first Bundesland section
-df = df[df["Bundesland"].notna()].copy()
+    # Forward-fill Bundesland: whenever a Bundesland name appears, tag all
+    # following rows with it until the next Bundesland name appears
+    df["Bundesland"] = df["Bezeichnung"].where(df["Bezeichnung"].isin(BUNDESLAENDER))
+    df["Bundesland"] = df["Bundesland"].ffill()
 
-# remove last row (Fußnote)
-df = df.iloc[:-1].copy()
+    # Drop rows before the first Bundesland section (header rows etc.)
+    df = df[df["Bundesland"].notna()].copy()
 
-# create Fahrzeugklasse column
-df["Fahrzeugklasse"] = df["Bezeichnung"]
+    # Drop last row (Fußnote / footnote)
+    df = df.iloc[:-1].copy()
 
-# Bundesland section rows represent totals
-df.loc[df["Bezeichnung"].isin(bundeslaender), "Fahrzeugklasse"] = "All"
+    # Vehicle class: same as Bezeichnung, except for the Bundesland total rows
+    df["Fahrzeugklasse"] = df["Bezeichnung"]
+    df.loc[df["Bezeichnung"].isin(BUNDESLAENDER), "Fahrzeugklasse"] = "All"
 
-# replace obvious missing values
-df = df.replace("-", pd.NA)
+    # Replace dash placeholders with proper NA
+    df = df.replace("-", pd.NA)
 
-# identify value columns
-value_cols = [
-    c for c in df.columns
-    if c not in ["Bundesland", "Fahrzeugklasse", "Bezeichnung"]
-]
+    # All columns except the label columns are numeric value columns
+    value_cols = [
+        c for c in df.columns
+        if c not in ["Bundesland", "Fahrzeugklasse", "Bezeichnung"]
+    ]
 
-# convert value columns to numeric
-for col in value_cols:
-    df[col] = (
-        df[col]
-        .astype(str)
-        .str.strip()
-        .str.replace(".", "", regex=False)
-        .str.replace(",", ".", regex=False)
-        .replace(["-", "nan", ""], pd.NA)
-    )
+    # Convert to numeric: Statistik Austria uses German number formatting
+    # (dot as thousands separator, comma as decimal) — strip both
+    for col in value_cols:
+        df[col] = (
+            df[col]
+            .astype(str)
+            .str.strip()
+            .str.replace(".", "", regex=False)
+            .str.replace(",", ".", regex=False)
+            .replace(["-", "nan", ""], pd.NA)
+        )
+        df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    df[col] = pd.to_numeric(df[col], errors="coerce")
+    df["Datum"] = f"{year}-{month_number:02d}-01"
+
+    df = df[["Bundesland", "Fahrzeugklasse", "Datum"] + value_cols]
+    df.columns = df.columns.str.strip()
+
+    return df
 
 
-#Add one column with the date of the data
-df["Datum"] = "2024-12-31"
+def main():
+    #########
+    # SELECT FILE
+    ########
 
+    # Exclude ~$ temp files created by LibreOffice/Excel when a file is open
+    files = sorted(f for f in RAW_DIR.glob("*.ods") if not f.name.startswith("~$"))
 
-# reorder columns
-df = df[
-    ["Bundesland", "Fahrzeugklasse", "Datum"] + value_cols
-]    
+    print()
+    print("ODS files found:")
+    for i, f in enumerate(files):
+        print(f"  {i}: {f.name}")
 
-#Clean column names, no trailing spaces
-df.columns = df.columns.str.strip()
+    if not files:
+        raise FileNotFoundError(f"No .ods files found in {RAW_DIR}")
+    print()
 
-#####
-#  CHECKPOINT
-#######
-print(df["Bundesland"].value_counts(dropna=False))
-print(df["Fahrzeugklasse"].unique())
-print(df.tail(10))
-print()
+    # Always pick the most recently downloaded file
+    file_path = max(files, key=lambda f: f.stat().st_mtime)
+    print(f"Selected file (newest): {file_path.name}")
+    print()
 
-#######
-# OUTPUT
-#######
+    # Extract year from filename (e.g. "...2026.ods" → 2026)
+    year_match = re.search(r"20\d{2}", file_path.stem)
+    if not year_match:
+        raise ValueError(f"Could not detect year in filename: {file_path.name}")
+    year = int(year_match.group())
 
-PROCESSED_DIR = Path("data/processed")
-PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    #########
+    # DETECT SHEETS
+    ########
 
-output_path = PROCESSED_DIR / "ev_registrations_clean_2024.csv"
+    ods_file = pd.ExcelFile(file_path, engine="odf")
+    all_sheets = ods_file.sheet_names
 
-df.to_csv(output_path, index=False)
+    # Last sheet is always the period summary (e.g. "Jänner-Mai") — skip it.
+    # All other sheets are months: index 0 = January, index 1 = February, etc.
+    month_sheets = all_sheets[:-1]
 
-df_check = pd.read_csv(output_path)
+    print(f"Sheets found: {all_sheets}")
+    print(f"Summary sheet (skipped): '{all_sheets[-1]}'")
+    print(f"Month sheets to process: {month_sheets}")
+    print()
 
-print(f"Saved processed file to: {output_path}")
-print("File exists:", output_path.exists())
-print()
+    #########
+    # PROCESS ALL MONTH SHEETS
+    ########
 
-# Prüfen ob Dateipfad existiert 
-#print(output_path)
-#print(output_path.exists())
+    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
-# Last control
-#display(df_check.head()) # Spaltennamen ?
-#print(df_check.shape) # Alle Zeilen/Spalten vorhanden ?
-#print(df_check.dtypes) # Richtiger datatype ?
+    for sheet_index, sheet_name in enumerate(month_sheets):
+        month_number = sheet_index + 1  # index 0 = January = month 1
+
+        print(f"--- Processing: '{sheet_name}' → {year}-{month_number:02d} ---")
+
+        df_raw = pd.read_excel(
+            file_path,
+            sheet_name=sheet_name,
+            header=None,
+            engine="odf"
+        )
+
+        df_clean = process_sheet(df_raw, year, month_number)
+
+        output_path = PROCESSED_DIR / f"ev_registrations_clean_{year}_{month_number:02d}.csv"
+        df_clean.to_csv(output_path, index=False)
+
+        print(f"  Saved: {output_path.name}  ({len(df_clean)} rows)")
+
+    print()
+    print(f"Done. Processed {len(month_sheets)} month(s) from {file_path.name}")
+    print()
+
+if __name__ == "__main__":
+    main()
