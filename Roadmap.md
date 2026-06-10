@@ -4,7 +4,8 @@
 
 **Project location:** `~/python-projects/ev_analysis`  
 **Startup:** `cd ~/python-projects/ev_analysis && source .venv/bin/activate && code .`  
-**Master data file:** `data/final/ev_registrations_monthly_clean_v.2.0.csv`  
+**Master data file:** `data/final/ev_registrations_monthly_clean.csv`  
+**Hard deadline:** 2026-06-16 (presentation + GitHub repo submission)  
 **Last updated:** 2026-06-10
 
 ---
@@ -13,19 +14,21 @@
 
 | Area | Status |
 |---|---|
-| Raw data download script | ✅ Working (`src/01_download_data.py`) |
-| Raw data processing (.ods → processed CSV) | ✅ Working (`src/02_process_raw_data.py`) |
-| Data combination (processed → final CSV) | ✅ Working (`src/03_combine_data.py`) |
+| Raw data download script | ✅ Working (`scripts/01_download_data.py`) |
+| Raw data processing (.ods → processed CSV) | ✅ Working (`scripts/02_process_raw_data.py`) |
+| Data combination (processed → final CSV) | ✅ Working (`scripts/03_combine_data.py`) |
 | Final CSV schema (8 columns) | ✅ Stable |
 | Data coverage | ✅ 2019-01 to 2026-03 (86 months) |
-| Klimadashboard-style plot | ✅ Working in notebook (`notebooks/plot_klimadashboard_v.2.0.ipynb`) |
-| Chart PNG export | ✅ `outputs/klimadashboard_v.2.1.png` |
-| Validation script | 🟡 Exists but needs update for 8-column schema |
+| Klimadashboard-style plot | ✅ Working in notebook |
+| Chart PNG export | ✅ `outputs/klimadashboard.png` |
+| Validation script | 🟡 Needs update for 8-column schema |
 | Standalone plot script | 🔴 Not extracted from notebook |
 | Chart spec documentation | 🔴 Not written |
-| Run-all pipeline script | ⬜ Not started |
-| Monthly automation | ⬜ Not started |
-| Bundesländer analysis | ⬜ Not started |
+| Repo structure / cleanup | 🔴 In progress |
+| `main.py` run-all pipeline | ⬜ Not started |
+| GitHub Actions automation | ⬜ Planned (post-deadline) |
+| Monthly scheduling | ⬜ Planned (post-deadline) |
+| Bundesländer analysis | ⬜ Planned (post-deadline) |
 
 ---
 
@@ -33,44 +36,103 @@
 
 1. **Kfz vs Pkw denominator** — Using PKW data only for final CSV and plot. Raw/processed files contain KFZ data as-is.
 2. **EV definition** — "Emission-free" = Elektro + Wasserstoff. Tracked as `emission_free_share` in the plot. "Elektro only" kept as `ev_share` for reference.
-3. **Hydrogen classification** — "Wasserstoff/Brennstoffzelle" is NOT hybrid. It is counted in `emission_free_registrations`.
+3. **Hydrogen classification** — "Wasserstoff/Brennstoffzelle" is NOT hybrid. Counted in `emission_free_registrations`.
 4. **Policy target source** — Österreichischer Mobilitätsmasterplan 2030. Document in `Sources/`.
 5. **Historical data access** — Monthly data 2019–2025 obtained and processed. All data is now fully monthly.
-6. **Klimadashboard contact** — Reached out, no reply yet.
+6. **Klimadashboard contact** — Reached out 2026-06-10, awaiting reply.
+7. **File versioning** — Removed version suffixes (`v.2.0`, `v.2.1`) from all filenames. Use fixed names + git for versioning.
+8. **Scripts-only src structure** — No `source/` module split needed at current project scope. All scripts runnable directly.
 
 ---
 
 ## Task List
 
-### Priority 1 — Pipeline integrity
+### Priority 1 — Repo cleanup (do first, everything depends on it)
 
-- [ ] **Update `src/04_validate_processed_data.py`** for 8-column schema  
-  Current schema: `month, total, electric, hybrid, emission_free, ev_share, hybrid_share, emission_free_share, source_file`  
-  Checks needed: column presence, YYYY-MM format, no duplicate months, numeric ranges (shares 0–1), derived column consistency (`ev_share = electric / total`), chronological order.
+- [ ] **Renumber and rename all scripts** in `scripts/`
+  - `00_inspect_raw_data.py` → delete
+  - `01_download_data.py` → keep, rename if clearer
+  - `02_process_raw_data.py` → integrate historical data processing here (skip if already processed)
+  - `03_combine_data.py` → keep
+  - `04_validate_processed_data.py` → keep (fix schema, see Priority 2)
+  - `05_plot_ev_share.py` → extract from notebook (see Priority 2)
 
-- [ ] **Extract plot code from notebook → `src/05_plot_ev_share.py`**  
-  Clean, runnable script. No blinking marker. German labels. Export PNG to `outputs/`.  
-  Key rules: monthly line for all data, policy target dashed line, trend line optional, static label for latest point.
+- [ ] **Remove version suffixes from all filenames**
+  - `ev_registrations_monthly_clean_v.2.0.csv` → `ev_registrations_monthly_clean.csv`
+  - `klimadashboard_v.2.1.png` → `klimadashboard.png`
+  - Notebook: `plot_klimadashboard_v.2.0.ipynb` → `plot_klimadashboard.ipynb`
+  - Update all internal references
 
-### Priority 2 — Documentation & presentation
+- [ ] **Reorganize folder structure**
+  ```
+  ev_analysis/
+  ├── data/
+  │   ├── raw/
+  │   ├── processed/
+  │   ├── final/
+  │   └── outputs/        ← move chart outputs here (or keep top-level outputs/)
+  ├── notebooks/          ← exploratory only; store outputs
+  ├── scripts/            ← renamed from src/, all runnable
+  ├── sources/            ← policy documents
+  ├── outputs/            ← final PNGs
+  ├── main.py
+  ├── requirements.txt
+  ├── README.md
+  └── Roadmap.md
+  ```
 
-- [ ] **Write `docs/chart_spec.md`** (internal spec)  
+- [ ] **Add changelog block** to top of each script and notebook
+  ```python
+  # CHANGELOG
+  # 2026-06-10 — initial version
+  # 2026-06-XX — description of change
+  ```
+
+### Priority 2 — Pipeline integrity
+
+- [ ] **Update `scripts/04_validate_processed_data.py`** for 8-column schema  
+  Checks: column presence, YYYY-MM format, no duplicate months, shares in 0–1 range, `ev_share = electric / total`, chronological order.
+
+- [ ] **Extract plot → `scripts/05_plot_ev_share.py`**  
+  Clean standalone script. German labels. No blinking marker. Export PNG to `outputs/`.  
+  Rules: monthly line, dashed policy target line, static label for latest point.
+
+- [ ] **Build `main.py`**  
+  Runs full pipeline: download → process → combine → validate → plot.  
+  Add skip logic: don't reprocess historical data if already present.
+
+### Priority 3 — Documentation
+
+- [ ] **Verify Austria 2030 policy target** — confirm Mobilitätsmasterplan 2030 target line is still current; update `Sources/` if needed.
+
+- [ ] **Write `docs/chart_spec.md`**  
   Cover: data file, schema, EV/emission-free definitions, policy target source, colors, fonts, axis logic, export sizes, known limitations.
 
-- [ ] **Update README** methodological note if anything changes in definitions or coverage.
+- [ ] **Update README** — reflect new folder structure, script names, fixed filenames.
 
-### Priority 3 — Pipeline usability
+### Priority 4 — Slides (June 14–15)
 
-- [ ] **Build `src/run_pipeline.py`**  
-  One command to run: download → process → combine → validate → plot.
+See separate slide outline. Repo must be clean before starting slides.
 
-- [ ] **Add `period_type` column** to final CSV (`observed_monthly` for all current data — historical estimates were replaced with real monthly data).
+---
 
-### Priority 4 — Future (after presentation)
+## Optional — Only if repo done by June 13
 
-- [ ] Monthly scheduling via launchd
-- [ ] Bundesländer analysis (long format, one row per month × Bundesland)
-- [ ] Potentially hand off visualization to Klimadashboard.at
+- [ ] **Send Klimadashboard email** with finished repo link; ask: full code integration, PNG only, or processed data only? *(Email sent 2026-06-10, awaiting reply.)*
+- [ ] **Check Klimadashboard GitHub** — if no reply, inspect their repo (with AI assistance) to assess integration complexity.
+- [ ] **Subsidy effect analysis** — optional add-on to chart or separate note.
+- [ ] **Bundesland graph** and/or other vehicle categories (LKW, Zweiräder).
+
+---
+
+## Post-Deadline / Future
+
+- [ ] **GitHub Actions** — automated monthly download, run tests, send email on result.
+- [ ] **Monthly scheduling** via launchd (macOS).
+- [ ] **Bundesländer analysis** — long format, one row per month × Bundesland.
+- [ ] **Klimadashboard integration** — pending their reply on preferred format.
+- [ ] **Contact Johannes** re: historical data for Schwerkraftfahrzeuge, Zweiräder, Vans from Statistik Austria.
+- [ ] **`period_type` column** in final CSV (`observed_monthly` for all current data).
 
 ---
 
@@ -91,12 +153,12 @@ source_file
 
 **Fuel groups:**
 ```python
-EV_COLUMNS           = ["Elektro"]
-HYBRID_COLUMNS       = ["Benzin/Elektro (hybrid)", "Diesel/Elektro (hybrid)"]
-EMISSION_FREE        = ["Elektro", "Wasserstoff(Brennstoffzelle)"]
-FOSSIL_COLUMNS       = ["Benzin", "Diesel", "Flüssiggas", "Erdgas",
-                        "Benzin/Flüssiggas (bivalent)", "Benzin/Erdgas (bivalent)",
-                        "Benzin inkl.Flex-Fuel"]
+EV_COLUMNS      = ["Elektro"]
+HYBRID_COLUMNS  = ["Benzin/Elektro (hybrid)", "Diesel/Elektro (hybrid)"]
+EMISSION_FREE   = ["Elektro", "Wasserstoff(Brennstoffzelle)"]
+FOSSIL_COLUMNS  = ["Benzin", "Diesel", "Flüssiggas", "Erdgas",
+                   "Benzin/Flüssiggas (bivalent)", "Benzin/Erdgas (bivalent)",
+                   "Benzin inkl.Flex-Fuel"]
 ```
 
 **Austria filter:**
@@ -120,6 +182,6 @@ EV_COLOR = "#F5AF4A"  # mobility orange
 
 ## How to Use This File
 
-1. Check the **Status table** to know where things stand.
-2. Pick the next task from the **priority list**.
-3. Come back here when done — tick off the task and update the status table.
+1. Check **Current Status** table for overview.
+2. Pick next open task from the priority list.
+3. Tick off and update status table when done.
