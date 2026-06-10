@@ -11,30 +11,20 @@ FINAL_FILE = Path("data/final/ev_registrations_monthly_clean.csv")
 
 EV_COLUMNS = [
     "Elektro",
-    
-]
-
-ALL_COLUMNS = [
-    "Benzin",
-    "Diesel", 
-
-    "Elektro",
-    
-    "Erdgas",
-    "Benzin/Flüssiggas (bivalent)",
-    "Benzin/Elektro (hybrid)", 
-    "Diesel/Elektro (hybrid)"
 ]
 
 EMISSION_FREE_COLUMNS = [
-    "Elektro",    
+    "Elektro",
+    "Wasserstoff (Brennstoffzelle)",
 ]
 
 HYBRID_COLUMNS = [
-    "Elektro",
     "Benzin/Elektro (hybrid)",
     "Diesel/Elektro (hybrid)",
 ]
+
+# Total is derived dynamically — all columns except these are fuel types
+NON_FUEL_COLS = {"Bundesland", "Fahrzeugklasse", "Datum", "source_file"}
 
 #######
 # Choose Files to combine1
