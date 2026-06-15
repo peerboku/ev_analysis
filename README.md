@@ -10,7 +10,7 @@ A reproducible Python pipeline that tracks the share of **emission-free passenge
 
 A self-contained mockup of how this could look as an embeddable Klimadashboard widget, with three tabs — **Grafik** (chart), **Tabelle** (full monthly data), and **Info** (context, targets, sources & methodology):
 
-![View interactive prototype](https://peerboku.github.io/kfz_dashboard_at/outputs/dashboard.html)
+[View interactive prototype](https://peerboku.github.io/kfz_dashboard_at/outputs/dashboard.html)
 
 ---
 
