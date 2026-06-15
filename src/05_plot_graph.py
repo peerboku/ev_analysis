@@ -56,29 +56,8 @@ def format_percent(x, _):
 
 monthly = df.copy()
 
-# Place each monthly observation around the middle of its month.
-monthly["plot_date_mid"] = (
-    monthly["plot_date"] + pd.offsets.MonthEnd(0)
-) - pd.offsets.Day(14)
-
 # Year helper for policy baseline.
 monthly["year"] = monthly["plot_date"].dt.year
-
-
-# ------------------------
-# Add Trend Line EV Share
-# ------------------------
-
-trend_data = monthly[["plot_date_mid", "emission_free_share"]].dropna().copy()
-trend_data["date_num"] = trend_data["plot_date_mid"].map(pd.Timestamp.toordinal)
-
-slope, intercept = np.polyfit(
-    trend_data["date_num"],
-    trend_data["emission_free_share"],
-    1
-)
-
-trend_data["trend"] = slope * trend_data["date_num"] + intercept
 
 # --------------------
 # Add Policy Lines for EU and AT
@@ -195,12 +174,24 @@ def style_kd_axis(ax):
     # Sets color of grid
     ax.grid(color=KD_GRID, alpha=0.35, linewidth=1, axis="y")
 
+    # Data scale and y-axis values
+
+    ymax = 0.4 
+    ax.set_ylim(0, ymax * 1.04)  # tiny buffer so top tick isn't clipped
+    ticks = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
+
+    ax.set_yticks(ticks)
+
+    labels = [f"{t * 100:.0f}" for t in ticks]
+    labels[-2] += " %"
+    ax.set_yticklabels(labels)
+
 def add_kd_header(fig, title):
     '''
     Adds and styles the header of the dashboard.
     '''
     fig.patch.set_facecolor(KD_BG)
-    header_y = 0.83 # y-axis start
+    header_y = 0.82 # y-axis start
     header_x = 0.08 # x-axis start
     header_w = 0.9 # width
     header_h = 0.15 # header height
@@ -260,31 +251,8 @@ def add_kd_header(fig, title):
 
     fig.add_artist(car_icon)
 
-def configure_share_yaxis(ax, zoom_to_40=False, show_labels=True):
 
-    '''
-    Controls data scale and y-axis values, depending on the Zoom.
-    '''
-
-    ymax = 0.4 if zoom_to_40 else 1.0
-
-    ax.set_ylim(0, ymax * 1.04)  # tiny buffer so top tick isn't clipped
-
-    if zoom_to_40:
-        ticks = [0, 0.1, 0.2, 0.3, 0.4] # y-axis only goes to 40 %
-    else:
-        ticks = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
-
-    ax.set_yticks(ticks)
-
-    if show_labels:
-        labels = [f"{t * 100:.0f}" for t in ticks]
-        labels[-1] += "%"
-        ax.set_yticklabels(labels)
-    else:
-        ax.set_yticklabels([])
-
-def plot_emission_free_share(focus_on_2026=False, zoom_to_40=False):
+def plot_emission_free_share():
     fig, ax = plt.subplots(figsize=(11, 6))
 
     add_kd_header(
@@ -345,18 +313,6 @@ def plot_emission_free_share(focus_on_2026=False, zoom_to_40=False):
     ax.xaxis.set_major_locator(YearLocator(base=2))
     ax.xaxis.set_major_formatter(DateFormatter("%Y"))
 
-    '''
-    legend = ax.legend(
-        loc="center right",
-        facecolor=KD_BG,
-        edgecolor=KD_GRID,
-        labelcolor=KD_TEXT,
-        framealpha=0.9,
-    )
-    '''
-
-
-
 
     # ----------------------
     # Policy Line
@@ -395,9 +351,6 @@ def plot_emission_free_share(focus_on_2026=False, zoom_to_40=False):
     )
 
     style_kd_axis(ax)
-    configure_share_yaxis(ax, zoom_to_40, show_labels=True)
-
-
 
     # --------------
     # Label Box for last observed point
@@ -414,7 +367,6 @@ def plot_emission_free_share(focus_on_2026=False, zoom_to_40=False):
         f"{last_end.strftime('%d.%m.%Y')}"
     )
 
-
     ax.annotate(
         f"{last_y:.1%} Anteil emissionsfreier PKW-Neuzulassungen im Zeitraum \n{last_period}",
         xy=(last_x, last_y),
@@ -429,14 +381,12 @@ def plot_emission_free_share(focus_on_2026=False, zoom_to_40=False):
 
     plt.subplots_adjust(top=0.82, bottom=0.13, left=0.08, right=0.97)
 
-    '''
     plt.savefig(
-        "../outputs/klimadashboard_v.2.1.png",
+        "outputs/dashboard_emissionsfreie_pkw_neuzulassungen.png",
         dpi=300,
         bbox_inches="tight",
         facecolor=fig.get_facecolor(),
     )
-    '''
 
     plt.show()
 

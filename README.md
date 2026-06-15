@@ -12,7 +12,7 @@ A reproducible Python pipeline for tracking the share of emission-free vehicles 
 - **Validates** the final dataset with 11 automated checks before graph creation
 - **Visualizes** the emission-free vehicle share over time as a Klimadashboard-style chart
 
-![Klimadashboard EV share chart](outputs/klimadashboard_v.2.1.png)
+![Klimadashboard EV share chart](outputs/dashboard_emissionsfreie_pkw_neuzulassungen.png)
 
 ---
 
