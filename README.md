@@ -1,6 +1,28 @@
-# ev_analysis
+# KFZ Dashboard AT — Emissionsfreie PKW-Neuzulassungen
 
-A reproducible Python pipeline for tracking the share of emission-free vehicles among new car registrations in Austria — visualized in a [Klimadashboard](https://klimadashboard.at)-inspired style.
+A reproducible Python pipeline that tracks the share of **emission-free passenger cars** among new car registrations in Austria, visualized in a [Klimadashboard](https://klimadashboard.at)-inspired style.
+
+![Emission-free PKW registrations chart](outputs/dashboard_emissionsfreie_pkw_neuzulassungen.png)
+
+---
+
+## Interactive prototype
+
+A self-contained mockup of how this could look as an embeddable Klimadashboard widget, with three tabs — **Grafik** (chart), **Tabelle** (full monthly data), and **Info** (context, targets, sources & methodology):
+
+- **View locally:** open [`outputs/dashboard.html`](outputs/dashboard.html) in any browser
+  ```bash
+  open outputs/dashboard.html        # macOS
+  ```
+- **View online (GitHub Pages):** enable Pages for this repo (Settings → Pages → deploy from `main`), then visit
+  `https://peerboku.github.io/kfz_dashboard_at/outputs/dashboard.html`
+
+The prototype is a single static HTML file. Regenerate it from the latest data with:
+```bash
+python src/build_prototype.py
+```
+
+> Note: `src/build_prototype.py` is a presentation/prototype tool only — it is **not** part of the automated pipeline.
 
 ---
 
@@ -8,31 +30,35 @@ A reproducible Python pipeline for tracking the share of emission-free vehicles 
 
 - **Downloads** the latest new-registration data (.ods) automatically from [Statistik Austria](https://www.statistik.at/statistiken/tourismus-und-verkehr/fahrzeuge/kfz-neuzulassungen)
 - **Processes** raw files into clean monthly CSVs (by fuel type: electric, hybrid, fossil, etc.)
-- **Combines** all processed files into a single validated master CSV
+- **Combines** all processed files into a single master CSV
 - **Validates** the final dataset with 11 automated checks before graph creation
 - **Visualizes** the emission-free vehicle share over time as a Klimadashboard-style chart
 
-![Klimadashboard EV share chart](outputs/dashboard_emissionsfreie_pkw_neuzulassungen.png)
+Run the whole chain with a single command — see [Running the pipeline](#running-the-pipeline).
 
 ---
 
 ## Data source
 
-**Statistik Austria** — KFZ-Neuzulassungen nach Bundesland und Kraftstoffart/Energiequelle  
+**Statistik Austria** — KFZ-Neuzulassungen nach Bundesland und Kraftstoffart/Energiequelle
 https://www.statistik.at/statistiken/tourismus-und-verkehr/fahrzeuge/kfz-neuzulassungen
 
-Data covers Austrian new **passenger car (PKW)** registrations, broken down by fuel type and federal state (*Bundesland*), from 2019 onward.
+Data covers Austrian new **passenger car (PKW, Klasse M1)** registrations, broken down by fuel type and federal state (*Bundesland*), from 2019 onward.
 
 ---
 
-## Methodological notes
+## Methodology
 
-All data points are monthly observations. Data is plotted at the approximate mid-month date.
+All data points are monthly observations, plotted at the approximate mid-month date.
 
-**Emission-free definition:** "Elektro" + "Wasserstoff/Brennstoffzelle" (hydrogen). Hydrogen is tracked separately but included in the emission-free total.  
-**EV (Elektro only):** tracked as a separate column.  
-**Hybrid:** "Benzin/Elektro (hybrid)" + "Diesel/Elektro (hybrid)" — not included in the graph (only in the table).  
-**Policy target line:** Straight-line path from the 2021 emission-free share to 100% by 2030-12-31 (source: Österreichischer Mobilitätsmasterplan 2030).
+- **Emission-free:** "Elektro" (BEV) + "Wasserstoff (Brennstoffzelle)" (FCEV). Hydrogen is included in the emission-free total.
+- **EV (Elektro only):** tracked as a separate column for reference.
+- **Hybrid:** "Benzin/Elektro" + "Diesel/Elektro" — *not* counted as emission-free (shown in the table only).
+- **Target paths:** two dashed lines, both starting from the 2020 mean emission-free share and rising linearly to 100 %:
+  - **AT target:** 100 % by end of 2030 — Österreichischer Mobilitätsmasterplan 2030 (p. 37).
+  - **EU target:** 100 % by end of 2035 — Verordnung (EU) 2019/631, amended by Verordnung (EU) 2023/851.
+
+Full chart specification: [`docs/chart_spec.md`](docs/chart_spec.md).
 
 ---
 
@@ -41,30 +67,34 @@ All data points are monthly observations. Data is plotted at the approximate mid
 ```
 kfz_dashboard_at/
 ├── data/
-│   ├── raw/            # Downloaded .ods / .xlsx files from Statistik Austria
+│   ├── raw/            # Downloaded .ods / .xlsx files from Statistik Austria (gitignored)
 │   ├── processed/      # Per-month cleaned CSVs (gitignored)
 │   ├── final/          # Master CSV (gitignored)
 │   └── media/          # Car icon used in the chart
-├── notebooks/
-│   └── plot_klimadashboard_v.2.0.ipynb   # Visualization notebook (exploratory)
+├── docs/
+│   └── chart_spec.md                       # Full chart specification
 ├── src/
-│   ├── 00_process_historical_data.py     # One-time: process historical xlsx → standard format
-│   ├── 01_download_data.py               # Auto-download latest .ods from Statistik Austria
-│   ├── 02_process_raw_data.py            # Process all month sheets → per-month CSVs
-│   ├── 03_combine_data.py                # Combine all processed CSVs → final master CSV
-│   ├── 04_validate_processed_data.py     # Validate final CSV + manual confirmation prompt
-│   └── 05_plot_graph.py                  # Standalone Klimadashboard-style chart script
-├── outputs/                              # Exported chart images (PNG)
-├── main.py                               # Run full pipeline (steps 01–05) in one command
+│   ├── 00_process_historical_data.py       # One-time: process historical xlsx → standard format
+│   ├── 01_download_data.py                 # Auto-download latest .ods from Statistik Austria
+│   ├── 02_process_raw_data.py              # Process all month sheets → per-month CSVs
+│   ├── 03_combine_data.py                  # Combine all processed CSVs → final master CSV
+│   ├── 04_validate_processed_data.py       # Validate final CSV + manual confirmation prompt
+│   ├── 05_plot_graph.py                    # Standalone Klimadashboard-style chart → PNG
+│   └── build_prototype.py                  # Build the interactive HTML prototype (presentation only)
+├── outputs/
+│   ├── dashboard_emissionsfreie_pkw_neuzulassungen.png   # Exported chart
+│   └── dashboard.html                                    # Interactive prototype widget
+├── Sources/                                # Policy documents (PDF)
+├── main.py                                 # Run full pipeline (steps 01–05) in one command
 ├── requirements.txt
-└── Roadmap.md
+└── README.md
 ```
 
 ---
 
 ## Final CSV schema
 
-Master file: `data/final/ev_registrations_monthly_clean.csv`  
+Master file: `data/final/ev_registrations_monthly_clean.csv`
 Coverage: **2019-01 to 2026-05** (89 months, fully monthly)
 
 | Column | Description |
@@ -109,11 +139,11 @@ This runs steps 01–05 in sequence: download → process → combine → valida
 
 **Or run steps individually:**
 ```bash
-python src/01_download_data.py        # Download latest .ods from Statistik Austria
-python src/02_process_raw_data.py     # Process month sheets → per-month CSVs
-python src/03_combine_data.py         # Combine → final master CSV
+python src/01_download_data.py            # Download latest .ods from Statistik Austria
+python src/02_process_raw_data.py         # Process month sheets → per-month CSVs
+python src/03_combine_data.py             # Combine → final master CSV
 python src/04_validate_processed_data.py  # Validate + confirmation prompt
-python src/05_plot_graph.py           # Generate chart
+python src/05_plot_graph.py               # Generate chart PNG
 ```
 
 ---
@@ -143,14 +173,11 @@ The chart uses a Klimadashboard-inspired dark theme:
 | Data combination | ✅ Working |
 | Data validation + confirmation prompt | ✅ Working |
 | Data coverage (2019-01 – 2026-05) | ✅ Complete |
-| Klimadashboard-style plot (notebook) | ✅ Working |
-| Chart PNG export | ✅ `outputs/klimadashboard_v.2.1.png` |
-| Standalone plot script | ✅ `src/05_plot_graph.py` |
-| Run-all pipeline script (`main.py`) | ✅ Working |
+| Standalone chart script + PNG export | ✅ `src/05_plot_graph.py` |
+| Run-all pipeline (`main.py`) | ✅ Working |
+| Interactive HTML prototype | ✅ `outputs/dashboard.html` |
 | Monthly automation | ⬜ Planned |
 | Bundesländer analysis | ⬜ Planned |
-
-See [Roadmap.md](Roadmap.md) for the full task list.
 
 ---
 
