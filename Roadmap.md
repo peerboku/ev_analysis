@@ -62,7 +62,7 @@
   - `ev_registrations_monthly_clean_v.2.0.csv` → `ev_registrations_monthly_clean.csv` ✓
   - Notebook and PNG still use version suffix — clean up in next pass
 
-- [ ] **Reorganize folder structure**
+- [x] **Reorganize folder structure**
   ```
   ev_analysis/
   ├── data/
@@ -80,13 +80,6 @@
   └── Roadmap.md
   ```
 
-- [ ] **Add changelog block** to top of each script and notebook
-  ```python
-  # CHANGELOG
-  # 2026-06-10 — initial version
-  # 2026-06-XX — description of change
-  ```
-
 ### Priority 2 — Pipeline integrity
 
 - [x] **Update `src/04_validate_processed_data.py`** for 8-column schema  
@@ -102,9 +95,9 @@
 
 ### Priority 3 — Documentation
 
-- [ ] **Verify Austria 2030 policy target** — confirm Mobilitätsmasterplan 2030 target line is still current; update `Sources/` if needed.
+- [x] **Verify Austria 2030 policy target** — confirm Mobilitätsmasterplan 2030 target line is still current; update `Sources/` if needed.
 
-- [ ] **Write `docs/chart_spec.md`**  
+- [x] **Write `docs/chart_spec.md`**  
   Cover: data file, schema, EV/emission-free definitions, policy target source, colors, fonts, axis logic, export sizes, known limitations.
 
 - [ ] **Update README** — reflect new folder structure, script names, fixed filenames.
