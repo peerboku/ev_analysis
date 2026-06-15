@@ -142,6 +142,8 @@ html = f"""<!DOCTYPE html>
   /* Info text */
   .info p {{ color: #d4d4d8; font-size: 15.5px; line-height: 1.65; margin: 0 0 16px; }}
   .info b {{ color: var(--text); }}
+  .info a {{ color: var(--mobility); text-decoration: underline; text-underline-offset: 2px; }}
+  .info a:hover {{ opacity: .85; }}
   .info .methodik {{ margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line); }}
   .info .methodik h3 {{ color: var(--text); font-size: 17px; font-weight: 700; margin: 0 0 12px; }}
   .info .methodik p {{ font-size: 14.5px; color: var(--muted); }}
@@ -225,19 +227,21 @@ html = f"""<!DOCTYPE html>
         {BRAND}
       </div>
       <div class="body tight">
-        <p>Mit dem Mobilitätsmasterplan 2030 hat Österreich den Rahmen gesetzt, den Verkehr
-           schrittweise auf klimafreundliche Antriebe umzustellen. Ein zentraler Baustein ist die
-           Umstellung der PKW-Neuzulassungen auf emissionsfreie Fahrzeuge — also rein
-           batterieelektrische Autos und Wasserstoff-Brennstoffzellenfahrzeuge. Auf EU-Ebene kommt
-           hinzu, dass ab 2035 keine neuen PKW mit reinem Verbrennungsmotor mehr zugelassen werden
-           dürfen.</p>
+        <p>Der österreichische Mobilitätsmasterplan 2030 hält fest, dass spätestens ab 2030 100 %
+           aller PKW- und Zweirad-Neuzulassungen emissionsfrei sein sollen. Als emissionsfrei
+           (Null-Emissionsfahrzeuge) gelten rein batterieelektrische Fahrzeuge (BEV) und
+           Wasserstoff-Brennstoffzellenfahrzeuge (FCEV) — bei der Statistik Austria entspricht das den
+           Kategorien »Elektro« und »Wasserstoff (Brennstoffzelle)«. Dieser Tracker bildet die
+           Entwicklung dieses Anteils für PKW-Neuzulassungen ab.</p>
 
-        <p>Die durchgezogene orange Linie zeigt den monatlich beobachteten Anteil emissionsfreier PKW
-           an allen Neuzulassungen in Österreich seit Jänner 2019. Der Punkt am Ende markiert den
-           zuletzt verfügbaren Monat — im <b>{latest_label}</b> waren <b>{latest_pct}</b> der
-           Neuzulassungen emissionsfrei. Die beiden gestrichelten Linien sind gedachte, lineare
-           Zielpfade: Sie starten beim Durchschnittswert des Jahres 2020 und steigen auf 100 %. Das
-           AT-Ziel ist auf Ende 2030 ausgerichtet, das EU-Ziel auf Ende 2035.</p>
+        <p>Auf europäischer Ebene gilt ab 1. Jänner 2035 für neue PKW ein Flottenzielwert, der einer
+           Verringerung der durchschnittlichen Flottenemissionen um 100 % gegenüber 2021 entspricht —
+           abgeleitet bedeutet das ebenfalls emissionsfreie Neuzulassungen. Die durchgezogene orange
+           Linie zeigt den monatlich beobachteten Anteil emissionsfreier PKW an allen Neuzulassungen
+           in Österreich seit Jänner 2019; der Punkt am Ende markiert den zuletzt verfügbaren Monat —
+           im <b>{latest_label}</b> waren <b>{latest_pct}</b> der Neuzulassungen emissionsfrei. Die
+           beiden gestrichelten Linien sind lineare Zielpfade vom Durchschnittswert des Jahres 2020
+           auf 100 %: das AT-Ziel auf Ende 2030, das EU-Ziel auf Ende 2035.</p>
 
         <p>Der Anteil emissionsfreier Neuzulassungen ist seit 2019 deutlich gestiegen, liegt aber noch
            klar unter dem Pfad, der für das AT-Ziel 2030 nötig wäre. Damit die Ziele erreichbar
@@ -247,20 +251,31 @@ html = f"""<!DOCTYPE html>
         <div class="methodik">
           <h3>Datenhinweise und Methodik</h3>
           <p>Datengrundlage sind die monatlichen KFZ-Neuzulassungen der Statistik Austria, gefiltert
-             auf Personenkraftwagen (Klasse M1) für Gesamtösterreich. Als emissionsfrei gelten rein
-             elektrische Fahrzeuge und Wasserstoff-Brennstoffzellenfahrzeuge; Hybride (Benzin/Elektro,
-             Diesel/Elektro) zählen nicht dazu. Der Anteil emissionsfrei ergibt sich aus den
-             emissionsfreien Zulassungen geteilt durch alle Neuzulassungen des jeweiligen Monats. Jeder
-             Monatswert durchläuft vor der Darstellung automatische Plausibilitätsprüfungen. Die
-             Zielpfade sind lineare Referenzlinien zur Einordnung und keine Prognose.</p>
+             auf Personenkraftwagen (Klasse M1) für Gesamtösterreich. Als emissionsfrei gelten
+             batterieelektrische Fahrzeuge (BEV) und Wasserstoff-Brennstoffzellenfahrzeuge (FCEV), bei
+             der Statistik Austria die Kategorien »Elektro« und »Wasserstoff (Brennstoffzelle)«;
+             Hybride zählen nicht dazu. Der Anteil emissionsfrei ergibt sich aus diesen Zulassungen
+             geteilt durch alle Neuzulassungen des jeweiligen Monats.</p>
+          <p><b>AT-Ziel:</b> Österreichischer Mobilitätsmasterplan 2030, S. 37 — „100 Prozent aller
+             PKW- und Zweirad-Neuzulassungen emissionsfrei spätestens ab 2030". Der Tracker bildet
+             davon den PKW-Anteil ab.</p>
+          <p><b>EU-Ziel:</b> Verordnung (EU) 2019/631, Artikel 5a, geändert durch
+             <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32023R0851&amp;qid=1778839144681" target="_blank" rel="noopener">Verordnung (EU) 2023/851</a>,
+             Artikel 1b: Ab 1. Jänner 2035 gilt für neue PKW ein Flottenzielwert von minus 100 %
+             gegenüber 2021 — also faktisch emissionsfreie Neuzulassungen. Ein separates
+             Kommissionspaket vom Dezember 2025
+             (<a href="https://transport.ec.europa.eu/transport-themes/action-plan-future-automotive-sector/automotive-package_en" target="_blank" rel="noopener">Automotive Package</a>,
+             <a href="https://climate.ec.europa.eu/eu-action/transport-decarbonisation/road-transport/cars-and-vans_en?prefLang=de" target="_blank" rel="noopener">Zusammenfassung</a>)
+             schlägt eine Absenkung auf 90 % vor; es befindet sich noch im parlamentarischen Verfahren
+             und ist derzeit kein geltendes Recht.</p>
+          <p>Die Zielpfade sind lineare Referenzlinien zur Einordnung und keine Prognose. Jeder
+             Monatswert durchläuft vor der Darstellung automatische Plausibilitätsprüfungen.</p>
           <table class="src-table">
             <thead>
               <tr><th>Datensatz</th><th>Datenquelle</th><th>Aktualisierung</th></tr>
             </thead>
             <tbody>
               <tr><td>PKW-Neuzulassungen nach Kraftstoffart</td><td>Statistik Austria</td><td>Monatlich</td></tr>
-              <tr><td>AT-Ziel 2030</td><td>Österreichischer Mobilitätsmasterplan 2030</td><td>—</td></tr>
-              <tr><td>EU-Ziel 2035</td><td>EU-Flottengrenzwerte (VO (EU) 2019/631)</td><td>—</td></tr>
             </tbody>
           </table>
         </div>
