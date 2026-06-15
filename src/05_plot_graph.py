@@ -9,16 +9,8 @@ from matplotlib.dates import DateFormatter, YearLocator, MonthLocator
 
 import matplotlib.dates as mdates
 
-from matplotlib.widgets import Button
-
-import ipywidgets as widgets
-from IPython.display import display
-
 import matplotlib.patches as patches
-import ipywidgets as widgets
-from IPython.display import display, clear_output
 
-from matplotlib.animation import FuncAnimation
 import matplotlib.transforms as mtransforms
 
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
@@ -74,7 +66,7 @@ monthly["year"] = monthly["plot_date"].dt.year
 
 
 # ------------------------
-# Add Trend Line EV Share 
+# Add Trend Line EV Share
 # ------------------------
 
 trend_data = monthly[["plot_date_mid", "emission_free_share"]].dropna().copy()
@@ -134,7 +126,7 @@ KD_FONT_CONDENSED = "Barlow Condensed"      # correct font implement later
 EV_COLOR = KD_MOBILITY # Use Klimadashboard color as main color
 
 plt.rcParams.update({
-    "font.family": "sans-serif",            # Implement KD_FONT here later 
+    "font.family": "sans-serif",            # Implement KD_FONT here later
     "axes.facecolor": KD_BG,
     "figure.facecolor": KD_BG,
     "axes.edgecolor": KD_GRID,
@@ -161,27 +153,8 @@ monthly["plot_date_mid"] = (
     monthly["plot_date"] + pd.offsets.Day(14)
 )
 
-# ------------------
-# Button Settings
-# ------------------
-
-
-zoom_40_toggle = widgets.ToggleButton(
-    value=False,
-    description="Zoom to 40%",
-)
-
-history_view_toggle = widgets.ToggleButton(
-    value=False,
-    description="Zoom to 2026+",
-)
-
-output = widgets.Output()
-
-display(history_view_toggle, zoom_40_toggle, output)
-
 # -----------------------
-# Functions 
+# Functions
 # -----------------------
 
 def style_kd_axis(ax):
@@ -193,7 +166,7 @@ def style_kd_axis(ax):
     # Makes axis around the graph/border disappear
     for spine in ax.spines.values():
         spine.set_visible(False)
-    
+
     # Makes 0 axis visible
     ax.spines["bottom"].set_visible(True)
     ax.spines["bottom"].set_color(KD_GRID)
@@ -239,7 +212,7 @@ def add_kd_header(fig, title):
         boxstyle="round,pad=0.0,rounding_size=0.03",
         transform=fig.transFigure,
         facecolor=KD_MOBILITY,
-        edgecolor="none",       
+        edgecolor="none",
         zorder=10,
         clip_on=False,
 
@@ -290,7 +263,7 @@ def add_kd_header(fig, title):
 def configure_share_yaxis(ax, zoom_to_40=False, show_labels=True):
 
     '''
-    Controls data scale and y-axis values, depending on the Zoom. 
+    Controls data scale and y-axis values, depending on the Zoom.
     '''
 
     ymax = 0.4 if zoom_to_40 else 1.0
@@ -312,191 +285,160 @@ def configure_share_yaxis(ax, zoom_to_40=False, show_labels=True):
         ax.set_yticklabels([])
 
 def plot_emission_free_share(focus_on_2026=False, zoom_to_40=False):
-    with output:
-        clear_output(wait=True)
+    fig, ax = plt.subplots(figsize=(11, 6))
 
-        fig, ax = plt.subplots(figsize=(11, 6))
-
-        add_kd_header(
-            fig,
-            "Emissionsfreie PKW-Neuzulassungen"
-        )
-
-        # Observed EV share
-        ax.plot(
-            monthly["plot_date_mid"],
-            monthly["emission_free_share"],
-            marker=None,
-            markersize=6,
-            linewidth=2.5,
-            color=KD_MOBILITY,
-            label=label_legend_emission_free_share,
-        )
-
-        end_x = monthly["plot_date_mid"].iloc[-1]
-        end_y = monthly["emission_free_share"].iloc[-1]
-
-        blink_point, = ax.plot(
-            [end_x], [end_y],
-            marker="o",
-            fillstyle="none",
-            markersize=8,
-            color=EV_COLOR,
-            linestyle="None",
-            label="_nolegend_",
-            )   
-
-        # Policy path
-
-        ax.plot(
-            policy_line_EU["plot_date"],
-            policy_line_EU["emission_free_share"],
-            linestyle=(0, (12, 6)),
-            linewidth=2.2,
-            color=KD_MOBILITY,
-            alpha=0.5,
-            label=label_legend_policy,
-        )
-
-        ax.plot(
-            policy_line_AT["plot_date"],
-            policy_line_AT["emission_free_share"],
-            linestyle=(0, (12, 6)),
-            linewidth=2.2,
-            color=KD_MOBILITY,
-            alpha=0.5,
-            label=label_legend_policy,
-        )
-
-        ax.set_xlim(
-            monthly["plot_date_mid"].min() - FULL_VIEW_PADDING,
-            pd.Timestamp("2034-12-31"),
-        )
-        ax.xaxis.set_major_locator(YearLocator(base=2))
-        ax.xaxis.set_major_formatter(DateFormatter("%Y"))
-        history_view_toggle.description = "Focus on 2026+"
-
-        '''
-        legend = ax.legend(
-            loc="center right",
-            facecolor=KD_BG,
-            edgecolor=KD_GRID,
-            labelcolor=KD_TEXT,
-            framealpha=0.9,
-        )
-        '''
-
-
-
-
-        # ----------------------
-        # Policy Line
-        # ----------------------
-
-        policy_x_EU = policy_line_EU["plot_date"].iloc[-1]
-        policy_y_EU = policy_line_EU["emission_free_share"].iloc[-1]
-
-        policy_x_AT = policy_line_AT["plot_date"].iloc[-1]
-        policy_y_AT = policy_line_AT["emission_free_share"].iloc[-1]
-
-        ax.annotate(
-            "EU-Ziel: 100 % (2035)",
-            xy=(policy_x_EU, policy_y_EU),
-            xytext=(-50, -10),
-            textcoords="offset points",
-            ha="right",
-            va="top",
-            color=EV_COLOR,
-            fontsize=9,
-            fontweight="bold",
-            alpha=0.5,
-        )
-
-        ax.annotate(
-            "AT-Ziel: 100% (2030)",
-            xy=(policy_x_AT, policy_y_AT),
-            xytext=(-50, -10),
-            textcoords="offset points",
-            ha="right",
-            va="top",
-            color=EV_COLOR,
-            fontsize=9,
-            fontweight="bold",
-            alpha=0.5,
-        )
-
-        style_kd_axis(ax)
-        configure_share_yaxis(ax, zoom_to_40, show_labels=True)
-        zoom_40_toggle.description = "Zoom to 40%"
-
-
-
-        def blink(frame):
-            blink_point.set_alpha(1.0 if frame % 2 == 0 else 0.2)
-            return blink_point,
-
-        anim = FuncAnimation(
-            fig,
-            blink,
-            interval=500,
-            blit=True,
-            cache_frame_data=False, 
-        )
-
-        fig.anim = anim
-
-        # --------------
-        # Label Box for last observed point
-        # --------------
-
-        last_x = monthly["plot_date_mid"].iloc[-1]
-        last_y = monthly["emission_free_share"].iloc[-1]
-        
-        last_start = monthly["plot_date"].iloc[-1]
-        last_end = last_start + pd.offsets.MonthEnd(0)
-
-        last_period = (
-            f"{last_start.strftime('%d.%m.%Y')} – "
-            f"{last_end.strftime('%d.%m.%Y')}"
-        )
-
-
-        ax.annotate(
-            f"{last_y:.1%} Anteil emissionsfreier PKW-Neuzulassungen im Zeitraum \n{last_period}",
-            xy=(last_x, last_y),
-            xytext=(12, -8),
-            textcoords="offset points",
-            ha="left",
-            va="top",
-            color=EV_COLOR,
-            fontsize=11,
-            fontweight="bold",
-        )
-
-        plt.subplots_adjust(top=0.82, bottom=0.13, left=0.08, right=0.97)
-
-        '''
-        plt.savefig(
-            "../outputs/klimadashboard_v.2.1.png",
-            dpi=300,
-            bbox_inches="tight",
-            facecolor=fig.get_facecolor(),
-        )
-        '''
-
-        plt.show()
-
-def update_plot(change):
-    plot_emission_free_share(
-        focus_on_2026=history_view_toggle.value,
-        zoom_to_40=zoom_40_toggle.value,
+    add_kd_header(
+        fig,
+        "Emissionsfreie PKW-Neuzulassungen"
     )
 
-history_view_toggle.observe(update_plot, names="value")
-zoom_40_toggle.observe(update_plot, names="value")
-
-# Draw the first version of the plot.
-plot_emission_free_share(
-    focus_on_2026=history_view_toggle.value,
-    zoom_to_40=zoom_40_toggle.value,
+    # Observed EV share
+    ax.plot(
+        monthly["plot_date_mid"],
+        monthly["emission_free_share"],
+        marker=None,
+        markersize=6,
+        linewidth=2.5,
+        color=KD_MOBILITY,
+        label=label_legend_emission_free_share,
     )
+
+    end_x = monthly["plot_date_mid"].iloc[-1]
+    end_y = monthly["emission_free_share"].iloc[-1]
+
+    end_point, = ax.plot(
+        [end_x], [end_y],
+        marker="o",
+        fillstyle="none",
+        markersize=8,
+        color=EV_COLOR,
+        linestyle="None",
+        label="_nolegend_",
+        )
+
+    # Policy path
+
+    ax.plot(
+        policy_line_EU["plot_date"],
+        policy_line_EU["emission_free_share"],
+        linestyle=(0, (12, 6)),
+        linewidth=2.2,
+        color=KD_MOBILITY,
+        alpha=0.5,
+        label=label_legend_policy,
+    )
+
+    ax.plot(
+        policy_line_AT["plot_date"],
+        policy_line_AT["emission_free_share"],
+        linestyle=(0, (12, 6)),
+        linewidth=2.2,
+        color=KD_MOBILITY,
+        alpha=0.5,
+        label=label_legend_policy,
+    )
+
+    ax.set_xlim(
+        monthly["plot_date_mid"].min() - FULL_VIEW_PADDING,
+        pd.Timestamp("2034-12-31"),
+    )
+    ax.xaxis.set_major_locator(YearLocator(base=2))
+    ax.xaxis.set_major_formatter(DateFormatter("%Y"))
+
+    '''
+    legend = ax.legend(
+        loc="center right",
+        facecolor=KD_BG,
+        edgecolor=KD_GRID,
+        labelcolor=KD_TEXT,
+        framealpha=0.9,
+    )
+    '''
+
+
+
+
+    # ----------------------
+    # Policy Line
+    # ----------------------
+
+    policy_x_EU = policy_line_EU["plot_date"].iloc[-1]
+    policy_y_EU = policy_line_EU["emission_free_share"].iloc[-1]
+
+    policy_x_AT = policy_line_AT["plot_date"].iloc[-1]
+    policy_y_AT = policy_line_AT["emission_free_share"].iloc[-1]
+
+    ax.annotate(
+        "EU-Ziel: 100 % (2035)",
+        xy=(policy_x_EU, policy_y_EU),
+        xytext=(-50, -10),
+        textcoords="offset points",
+        ha="right",
+        va="top",
+        color=EV_COLOR,
+        fontsize=9,
+        fontweight="bold",
+        alpha=0.5,
+    )
+
+    ax.annotate(
+        "AT-Ziel: 100% (2030)",
+        xy=(policy_x_AT, policy_y_AT),
+        xytext=(-50, -10),
+        textcoords="offset points",
+        ha="right",
+        va="top",
+        color=EV_COLOR,
+        fontsize=9,
+        fontweight="bold",
+        alpha=0.5,
+    )
+
+    style_kd_axis(ax)
+    configure_share_yaxis(ax, zoom_to_40, show_labels=True)
+
+
+
+    # --------------
+    # Label Box for last observed point
+    # --------------
+
+    last_x = monthly["plot_date_mid"].iloc[-1]
+    last_y = monthly["emission_free_share"].iloc[-1]
+
+    last_start = monthly["plot_date"].iloc[-1]
+    last_end = last_start + pd.offsets.MonthEnd(0)
+
+    last_period = (
+        f"{last_start.strftime('%d.%m.%Y')} – "
+        f"{last_end.strftime('%d.%m.%Y')}"
+    )
+
+
+    ax.annotate(
+        f"{last_y:.1%} Anteil emissionsfreier PKW-Neuzulassungen im Zeitraum \n{last_period}",
+        xy=(last_x, last_y),
+        xytext=(12, -8),
+        textcoords="offset points",
+        ha="left",
+        va="top",
+        color=EV_COLOR,
+        fontsize=11,
+        fontweight="bold",
+    )
+
+    plt.subplots_adjust(top=0.82, bottom=0.13, left=0.08, right=0.97)
+
+    '''
+    plt.savefig(
+        "../outputs/klimadashboard_v.2.1.png",
+        dpi=300,
+        bbox_inches="tight",
+        facecolor=fig.get_facecolor(),
+    )
+    '''
+
+    plt.show()
+
+
+plot_emission_free_share()
