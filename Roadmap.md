@@ -2,11 +2,11 @@
 
 **Goal:** Reproducible Python pipeline + Klimadashboard-style visualization of Austrian EV share among new car registrations (Statistik Austria data).
 
-**Project location:** `~/python-projects/ev_analysis`  
-**Startup:** `cd ~/python-projects/ev_analysis && source .venv/bin/activate && code .`  
+**Project location:** `~/python-projects/kfz_dashboard_at`  
+**Startup:** `cd ~/python-projects/kfz_dashboard_at && source .venv/bin/activate && code .`  
 **Master data file:** `data/final/ev_registrations_monthly_clean.csv`  
 **Hard deadline:** 2026-06-16 (presentation + GitHub repo submission)  
-**Last updated:** 2026-06-10
+**Last updated:** 2026-06-15
 
 ---
 
@@ -21,12 +21,12 @@
 | Data validation + confirmation prompt | ✅ Working (`src/04_validate_processed_data.py`) |
 | Final CSV schema (8 columns) | ✅ Stable |
 | Data coverage | ✅ 2019-01 to 2026-05 (89 months) |
-| Klimadashboard-style plot | ✅ Working in notebook |
-| Chart PNG export | ✅ `outputs/klimadashboard_v.2.1.png` |
-| Standalone plot script | 🔴 Not extracted from notebook |
+| Klimadashboard-style plot | ✅ Working in notebook + `src/05_plot_graph.py` |
+| Chart PNG export | 🟡 Script ready; `savefig` not yet uncommented |
+| Standalone plot script | ✅ `src/05_plot_graph.py` |
 | Chart spec documentation | 🔴 Not written |
 | Repo structure / cleanup | 🟡 In progress |
-| `main.py` run-all pipeline | ⬜ Not started |
+| `main.py` run-all pipeline | ✅ Working |
 | GitHub Actions automation | ⬜ Planned (post-deadline) |
 | Monthly scheduling | ⬜ Planned (post-deadline) |
 | Bundesländer analysis | ⬜ Planned (post-deadline) |
@@ -92,13 +92,13 @@
 - [x] **Update `src/04_validate_processed_data.py`** for 8-column schema  
   11 checks: column presence, YYYY-MM format, no duplicates, no gaps, no missing values, counts within total, shares in 0–1, formula checks, chronological order. Summary table + manual confirmation prompt.
 
-- [ ] **Extract plot → `scripts/05_plot_ev_share.py`**  
+- [x] **Extract plot → `scripts/05_plot_ev_share.py`**  
   Clean standalone script. German labels. No blinking marker. Export PNG to `outputs/`.  
   Rules: monthly line, dashed policy target line, static label for latest point.
 
-- [ ] **Build `main.py`**  
+- [x] **Build `main.py`**  
   Runs full pipeline: download → process → combine → validate → plot.  
-  Add skip logic: don't reprocess historical data if already present.
+  Skips step 00 if historical CSV already present; stops on any non-zero exit code.
 
 ### Priority 3 — Documentation
 

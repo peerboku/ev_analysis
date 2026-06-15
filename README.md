@@ -31,7 +31,7 @@ All data points are monthly observations. Data is plotted at the approximate mid
 
 **Emission-free definition:** "Elektro" + "Wasserstoff/Brennstoffzelle" (hydrogen). Hydrogen is tracked separately but included in the emission-free total.  
 **EV (Elektro only):** tracked as a separate column.  
-**Hybrid:** "Benzin/Elektro (hybrid)" + "Diesel/Elektro (hybrid)" — not included in the emission-free total.  
+**Hybrid:** "Benzin/Elektro (hybrid)" + "Diesel/Elektro (hybrid)" — not included in the graph (only in the table).  
 **Policy target line:** Straight-line path from the 2021 emission-free share to 100% by 2030-12-31 (source: Österreichischer Mobilitätsmasterplan 2030).
 
 ---
@@ -39,7 +39,7 @@ All data points are monthly observations. Data is plotted at the approximate mid
 ## Project structure
 
 ```
-ev_analysis/
+kfz_dashboard_at/
 ├── data/
 │   ├── raw/            # Downloaded .ods / .xlsx files from Statistik Austria
 │   ├── processed/      # Per-month cleaned CSVs (gitignored)
@@ -53,8 +53,9 @@ ev_analysis/
 │   ├── 02_process_raw_data.py            # Process all month sheets → per-month CSVs
 │   ├── 03_combine_data.py                # Combine all processed CSVs → final master CSV
 │   ├── 04_validate_processed_data.py     # Validate final CSV + manual confirmation prompt
-│   └── inspect_raw_data.py              # Interactive tool to inspect raw file structure
+│   └── 05_plot_graph.py                  # Standalone Klimadashboard-style chart script
 ├── outputs/                              # Exported chart images (PNG)
+├── main.py                               # Run full pipeline (steps 01–05) in one command
 ├── requirements.txt
 └── Roadmap.md
 ```
@@ -83,8 +84,8 @@ Coverage: **2019-01 to 2026-05** (89 months, fully monthly)
 ## Setup
 
 ```bash
-git clone https://github.com/peerboku/ev_analysis.git
-cd ev_analysis
+git clone https://github.com/peerboku/kfz_dashboard_at.git
+cd kfz_dashboard_at
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -99,25 +100,20 @@ pip install -r requirements.txt
 python src/00_process_historical_data.py
 ```
 
-**Monthly update:**
+**Monthly update — run the full pipeline in one command:**
 ```bash
-# 1. Download the latest raw data from Statistik Austria
-python src/01_download_data.py
-
-# 2. Process all month sheets from the downloaded file → per-month CSVs
-python src/02_process_raw_data.py
-
-# 3. Combine all processed files → final master CSV
-python src/03_combine_data.py
-
-# 4. Validate final CSV — reviews data and asks for confirmation before plotting
-python src/04_validate_processed_data.py
+python main.py
 ```
 
-The visualization is in `notebooks/plot_klimadashboard_v.2.0.ipynb`. Open with JupyterLab:
+This runs steps 01–05 in sequence: download → process → combine → validate → plot. It stops if any step fails. Step 04 includes an interactive confirmation prompt before plotting.
 
+**Or run steps individually:**
 ```bash
-jupyter lab
+python src/01_download_data.py        # Download latest .ods from Statistik Austria
+python src/02_process_raw_data.py     # Process month sheets → per-month CSVs
+python src/03_combine_data.py         # Combine → final master CSV
+python src/04_validate_processed_data.py  # Validate + confirmation prompt
+python src/05_plot_graph.py           # Generate chart
 ```
 
 ---
@@ -149,8 +145,8 @@ The chart uses a Klimadashboard-inspired dark theme:
 | Data coverage (2019-01 – 2026-05) | ✅ Complete |
 | Klimadashboard-style plot (notebook) | ✅ Working |
 | Chart PNG export | ✅ `outputs/klimadashboard_v.2.1.png` |
-| Standalone plot script | 🔴 Not extracted from notebook yet |
-| Run-all pipeline script (`main.py`) | ⬜ Planned |
+| Standalone plot script | ✅ `src/05_plot_graph.py` |
+| Run-all pipeline script (`main.py`) | ✅ Working |
 | Monthly automation | ⬜ Planned |
 | Bundesländer analysis | ⬜ Planned |
 
