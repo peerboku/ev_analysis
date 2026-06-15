@@ -117,7 +117,8 @@ See separate slide outline. Repo must be clean before starting slides.
 
 ## Optional — Only if repo done by June 13
 
-- [ ] **Send Klimadashboard email** with finished repo link; ask: full code integration, PNG only, or processed data only? *(Email sent 2026-06-10, awaiting reply.)*
+- [x] **Send Klimadashboard email** with finished repo link; ask: full code integration, PNG only, or processed data only? 
+  Reply sent 
 - [ ] **Check Klimadashboard GitHub** — if no reply, inspect their repo (with AI assistance) to assess integration complexity.
 - [ ] **Subsidy effect analysis** — optional add-on to chart or separate note.
 - [ ] **Bundesland graph** and/or other vehicle categories (LKW, Zweiräder).

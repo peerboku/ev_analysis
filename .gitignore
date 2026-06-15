@@ -5,8 +5,7 @@ __pycache__/
 data/raw/
 data/processed/
 Sources/
-Handoff_prompt_master.md
-plotting_cleanup_prompt.md
 short_prompt.md
 data/
 CLAUDE.md
+Roadmap.md
