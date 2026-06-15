@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emissionsfreie PKW-Neuzulassungen — Österreich</title>
+<style>
+  :root {
+    --bg: #111113;
+    --panel: #27272A;
+    --grid: #71717B;
+    --text: #F4F4F5;
+    --muted: #9F9FA9;
+    --mobility: #F5AF4A;
+    --kd-green: #3FBE8C;
+    --line: #2a2a2e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 16px;
+    background: #0c0c0d;
+    color: var(--text);
+    font-family: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .widget {
+    max-width: 860px; margin: 0 auto;
+    background: var(--bg);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 0 #1c1c1f inset;
+  }
+
+  /* Plain title header (all tabs) */
+  .plain-header {
+    padding: 22px 26px 8px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  }
+  .plain-header h2 { margin: 0; font-size: 21px; font-weight: 700; line-height: 1.25; }
+  .plain-header .subtitle { margin: 6px 0 0; color: var(--muted); font-size: 15px; line-height: 1.5; max-width: 56ch; }
+  .brand { display: flex; align-items: center; gap: 8px; color: var(--kd-green); font-weight: 600; font-size: 15px; white-space: nowrap; }
+  .brand .logo { flex: none; }
+
+  .body { padding: 20px 26px 8px; }
+  .body.tight { padding-top: 8px; }
+
+  img.chart { width: 100%; height: auto; display: block; border-radius: 8px; }
+
+  .source { color: var(--muted); font-size: 12.5px; line-height: 1.5; padding: 6px 26px 0; }
+
+  /* Table */
+  .table-wrap { max-height: 440px; overflow: auto; border-radius: 10px; border: 1px solid var(--line); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead th {
+    position: sticky; top: 0; background: var(--panel); color: var(--muted);
+    text-align: left; font-weight: 600; padding: 10px 14px; white-space: nowrap;
+  }
+  tbody td { padding: 8px 14px; border-top: 1px solid #1f1f22; }
+  tbody tr:hover { background: #1a1a1d; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* Info text */
+  .info p { color: #d4d4d8; font-size: 15.5px; line-height: 1.65; margin: 0 0 16px; }
+  .info b { color: var(--text); }
+  .info .methodik { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line); }
+  .info .methodik h3 { color: var(--text); font-size: 17px; font-weight: 700; margin: 0 0 12px; }
+  .info .methodik p { font-size: 14.5px; color: var(--muted); }
+  .src-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
+  .src-table th { text-align: left; color: var(--muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  .src-table td { padding: 8px 12px; border-bottom: 1px solid #1f1f22; color: #d4d4d8; vertical-align: top; }
+  .src-table td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Bottom toggle bar */
+  .toolbar {
+    display: flex; align-items: stretch; justify-content: space-between;
+    border-top: 1px solid var(--line); margin-top: 14px;
+  }
+  .toolbar-left { display: flex; }
+  .toolbar-right { display: flex; align-items: center; padding-right: 18px; gap: 16px; color: var(--muted); }
+  .toolbar-right a { color: var(--muted); display: inline-flex; cursor: pointer; }
+  .toolbar-right a:hover { color: var(--text); }
+  .tab {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 0; background: transparent; color: var(--muted);
+    font: inherit; font-size: 15px; padding: 16px 20px; cursor: pointer;
+    border-top: 2px solid transparent; margin-top: -1px;
+    transition: color .15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab[aria-selected="true"] { color: var(--text); border-top-color: var(--mobility); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="widget">
+
+    <!-- Grafik -->
+    <section id="grafik" class="panel active">
+      <div class="plain-header">
+        <div>
+          <h2>Elektromobilität Ziele und Neuzulassungen</h2>
+          <p class="subtitle">Emissionsfreie PKW-Zulassungen muss mehr Priorität bekommen für 2030-AT-Ziel und 2035-EU-Ziel</p>
+        </div>
+        <span class="brand">Klimadashboard.at<svg class="logo" viewBox="0 0 100 100" width="26" height="26" aria-hidden="true"><defs><linearGradient id="kg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#57C98C"/><stop offset="1" stop-color="#2BA77A"/></linearGradient></defs><rect x="4" y="4" width="92" height="92" rx="20" fill="url(#kg)"/><rect x="22" y="32" width="20" height="38" rx="6" fill="#EAF7EF" opacity="0.95"/><polyline points="60,32 40,51 60,70" fill="none" stroke="#EAF7EF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/><polyline points="80,32 60,51 80,70" fill="none" stroke="#EAF7EF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg></span>
+      </div>
+      <div class="body"><img class="chart" src="dashboard_emissionsfreie_pkw_neuzulassungen.png" alt="Diagramm: Emissionsfreie PKW-Neuzulassungen"></div>
+      <p class="source">Quelle: Statistik Austria — KFZ-Neuzulassungen nach Bundesland und Kraftstoffart/Energiequelle (Stand: Mai 2026).<br>Zielpfade: Mobilitätsmasterplan 2030 (AT), EU-Flottengrenzwerte 2035.</p>
+    </section>
+
+    <!-- Tabelle -->
+    <section id="tabelle" class="panel">
+      <div class="plain-header">
+        <h2>Neuzulassungen nach Monat</h2>
+        <span class="brand">Klimadashboard.at<svg class="logo" viewBox="0 0 100 100" width="26" height="26" aria-hidden="true"><defs><linearGradient id="kg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#57C98C"/><stop offset="1" stop-color="#2BA77A"/></linearGradient></defs><rect x="4" y="4" width="92" height="92" rx="20" fill="url(#kg)"/><rect x="22" y="32" width="20" height="38" rx="6" fill="#EAF7EF" opacity="0.95"/><polyline points="60,32 40,51 60,70" fill="none" stroke="#EAF7EF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/><polyline points="80,32 60,51 80,70" fill="none" stroke="#EAF7EF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg></span>
+      </div>
+      <div class="body tight">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Monat</th>
+                <th style="text-align:right">Neuzulassungen gesamt</th>
+                <th style="text-align:right">Elektro</th>
+                <th style="text-align:right">Hybrid</th>
+                <th style="text-align:right">Emissionsfrei</th>
+                <th style="text-align:right">Anteil Elektro</th>
+                <th style="text-align:right">Anteil Hybrid</th>
+                <th style="text-align:right">Anteil emissionsfrei</th>
+              </tr>
+            </thead>
+            <tbody>
+<tr><td>Mai 2026</td><td class='num'>25.529</td><td class='num'>6.598</td><td class='num'>10.171</td><td class='num'>6.599</td><td class='num'>25,8 %</td><td class='num'>39,8 %</td><td class='num'>25,8 %</td></tr>
+<tr><td>April 2026</td><td class='num'>27.509</td><td class='num'>7.122</td><td class='num'>11.363</td><td class='num'>7.123</td><td class='num'>25,9 %</td><td class='num'>41,3 %</td><td class='num'>25,9 %</td></tr>
+<tr><td>März 2026</td><td class='num'>33.018</td><td class='num'>8.206</td><td class='num'>13.678</td><td class='num'>8.206</td><td class='num'>24,9 %</td><td class='num'>41,4 %</td><td class='num'>24,9 %</td></tr>
+<tr><td>Februar 2026</td><td class='num'>21.288</td><td class='num'>4.439</td><td class='num'>8.816</td><td class='num'>4.439</td><td class='num'>20,9 %</td><td class='num'>41,4 %</td><td class='num'>20,9 %</td></tr>
+<tr><td>Jänner 2026</td><td class='num'>22.929</td><td class='num'>4.702</td><td class='num'>9.234</td><td class='num'>4.702</td><td class='num'>20,5 %</td><td class='num'>40,3 %</td><td class='num'>20,5 %</td></tr>
+<tr><td>Dezember 2025</td><td class='num'>22.376</td><td class='num'>4.621</td><td class='num'>10.029</td><td class='num'>4.621</td><td class='num'>20,7 %</td><td class='num'>44,8 %</td><td class='num'>20,7 %</td></tr>
+<tr><td>November 2025</td><td class='num'>23.008</td><td class='num'>4.714</td><td class='num'>9.207</td><td class='num'>4.714</td><td class='num'>20,5 %</td><td class='num'>40,0 %</td><td class='num'>20,5 %</td></tr>
+<tr><td>Oktober 2025</td><td class='num'>24.479</td><td class='num'>5.165</td><td class='num'>10.120</td><td class='num'>5.165</td><td class='num'>21,1 %</td><td class='num'>41,3 %</td><td class='num'>21,1 %</td></tr>
+<tr><td>September 2025</td><td class='num'>25.745</td><td class='num'>5.383</td><td class='num'>10.083</td><td class='num'>5.383</td><td class='num'>20,9 %</td><td class='num'>39,2 %</td><td class='num'>20,9 %</td></tr>
+<tr><td>August 2025</td><td class='num'>21.452</td><td class='num'>4.314</td><td class='num'>8.973</td><td class='num'>4.314</td><td class='num'>20,1 %</td><td class='num'>41,8 %</td><td class='num'>20,1 %</td></tr>
+<tr><td>Juli 2025</td><td class='num'>24.867</td><td class='num'>4.920</td><td class='num'>10.135</td><td class='num'>4.920</td><td class='num'>19,8 %</td><td class='num'>40,8 %</td><td class='num'>19,8 %</td></tr>
+<tr><td>Juni 2025</td><td class='num'>27.868</td><td class='num'>6.239</td><td class='num'>10.609</td><td class='num'>6.239</td><td class='num'>22,4 %</td><td class='num'>38,1 %</td><td class='num'>22,4 %</td></tr>
+<tr><td>Mai 2025</td><td class='num'>24.311</td><td class='num'>5.428</td><td class='num'>9.344</td><td class='num'>5.428</td><td class='num'>22,3 %</td><td class='num'>38,4 %</td><td class='num'>22,3 %</td></tr>
+<tr><td>April 2025</td><td class='num'>24.855</td><td class='num'>5.690</td><td class='num'>9.656</td><td class='num'>5.690</td><td class='num'>22,9 %</td><td class='num'>38,8 %</td><td class='num'>22,9 %</td></tr>
+<tr><td>März 2025</td><td class='num'>25.950</td><td class='num'>6.122</td><td class='num'>9.499</td><td class='num'>6.122</td><td class='num'>23,6 %</td><td class='num'>36,6 %</td><td class='num'>23,6 %</td></tr>
+<tr><td>Februar 2025</td><td class='num'>19.619</td><td class='num'>4.233</td><td class='num'>7.162</td><td class='num'>4.233</td><td class='num'>21,6 %</td><td class='num'>36,5 %</td><td class='num'>21,6 %</td></tr>
+<tr><td>Jänner 2025</td><td class='num'>20.448</td><td class='num'>3.822</td><td class='num'>7.047</td><td class='num'>3.822</td><td class='num'>18,7 %</td><td class='num'>34,5 %</td><td class='num'>18,7 %</td></tr>
+<tr><td>Dezember 2024</td><td class='num'>21.689</td><td class='num'>4.263</td><td class='num'>7.146</td><td class='num'>4.263</td><td class='num'>19,7 %</td><td class='num'>32,9 %</td><td class='num'>19,7 %</td></tr>
+<tr><td>November 2024</td><td class='num'>19.096</td><td class='num'>3.737</td><td class='num'>6.882</td><td class='num'>3.737</td><td class='num'>19,6 %</td><td class='num'>36,0 %</td><td class='num'>19,6 %</td></tr>
+<tr><td>Oktober 2024</td><td class='num'>21.981</td><td class='num'>3.990</td><td class='num'>8.358</td><td class='num'>3.990</td><td class='num'>18,2 %</td><td class='num'>38,0 %</td><td class='num'>18,2 %</td></tr>
+<tr><td>September 2024</td><td class='num'>19.894</td><td class='num'>4.421</td><td class='num'>6.357</td><td class='num'>4.421</td><td class='num'>22,2 %</td><td class='num'>32,0 %</td><td class='num'>22,2 %</td></tr>
+<tr><td>August 2024</td><td class='num'>17.115</td><td class='num'>3.100</td><td class='num'>5.855</td><td class='num'>3.100</td><td class='num'>18,1 %</td><td class='num'>34,2 %</td><td class='num'>18,1 %</td></tr>
+<tr><td>Juli 2024</td><td class='num'>18.901</td><td class='num'>2.933</td><td class='num'>6.562</td><td class='num'>2.934</td><td class='num'>15,5 %</td><td class='num'>34,7 %</td><td class='num'>15,5 %</td></tr>
+<tr><td>Juni 2024</td><td class='num'>30.693</td><td class='num'>4.696</td><td class='num'>9.074</td><td class='num'>4.696</td><td class='num'>15,3 %</td><td class='num'>29,6 %</td><td class='num'>15,3 %</td></tr>
+<tr><td>Mai 2024</td><td class='num'>19.820</td><td class='num'>3.448</td><td class='num'>5.707</td><td class='num'>3.448</td><td class='num'>17,4 %</td><td class='num'>28,8 %</td><td class='num'>17,4 %</td></tr>
+<tr><td>April 2024</td><td class='num'>21.337</td><td class='num'>3.232</td><td class='num'>5.837</td><td class='num'>3.232</td><td class='num'>15,1 %</td><td class='num'>27,4 %</td><td class='num'>15,1 %</td></tr>
+<tr><td>März 2024</td><td class='num'>25.701</td><td class='num'>4.657</td><td class='num'>7.676</td><td class='num'>4.657</td><td class='num'>18,1 %</td><td class='num'>29,9 %</td><td class='num'>18,1 %</td></tr>
+<tr><td>Februar 2024</td><td class='num'>20.010</td><td class='num'>3.322</td><td class='num'>6.026</td><td class='num'>3.322</td><td class='num'>16,6 %</td><td class='num'>30,1 %</td><td class='num'>16,6 %</td></tr>
+<tr><td>Jänner 2024</td><td class='num'>17.552</td><td class='num'>2.823</td><td class='num'>5.538</td><td class='num'>2.823</td><td class='num'>16,1 %</td><td class='num'>31,6 %</td><td class='num'>16,1 %</td></tr>
+<tr><td>Dezember 2023</td><td class='num'>18.497</td><td class='num'>4.019</td><td class='num'>5.011</td><td class='num'>4.019</td><td class='num'>21,7 %</td><td class='num'>27,1 %</td><td class='num'>21,7 %</td></tr>
+<tr><td>November 2023</td><td class='num'>18.900</td><td class='num'>4.330</td><td class='num'>5.342</td><td class='num'>4.330</td><td class='num'>22,9 %</td><td class='num'>28,3 %</td><td class='num'>22,9 %</td></tr>
+<tr><td>Oktober 2023</td><td class='num'>18.867</td><td class='num'>4.378</td><td class='num'>5.765</td><td class='num'>4.378</td><td class='num'>23,2 %</td><td class='num'>30,6 %</td><td class='num'>23,2 %</td></tr>
+<tr><td>September 2023</td><td class='num'>19.840</td><td class='num'>4.256</td><td class='num'>6.000</td><td class='num'>4.256</td><td class='num'>21,5 %</td><td class='num'>30,2 %</td><td class='num'>21,5 %</td></tr>
+<tr><td>August 2023</td><td class='num'>18.790</td><td class='num'>3.945</td><td class='num'>5.478</td><td class='num'>3.946</td><td class='num'>21,0 %</td><td class='num'>29,2 %</td><td class='num'>21,0 %</td></tr>
+<tr><td>Juli 2023</td><td class='num'>17.566</td><td class='num'>3.321</td><td class='num'>5.099</td><td class='num'>3.321</td><td class='num'>18,9 %</td><td class='num'>29,0 %</td><td class='num'>18,9 %</td></tr>
+<tr><td>Juni 2023</td><td class='num'>24.511</td><td class='num'>4.612</td><td class='num'>6.802</td><td class='num'>4.618</td><td class='num'>18,8 %</td><td class='num'>27,8 %</td><td class='num'>18,8 %</td></tr>
+<tr><td>Mai 2023</td><td class='num'>20.623</td><td class='num'>4.130</td><td class='num'>5.705</td><td class='num'>4.131</td><td class='num'>20,0 %</td><td class='num'>27,7 %</td><td class='num'>20,0 %</td></tr>
+<tr><td>April 2023</td><td class='num'>18.504</td><td class='num'>3.395</td><td class='num'>5.310</td><td class='num'>3.395</td><td class='num'>18,3 %</td><td class='num'>28,7 %</td><td class='num'>18,3 %</td></tr>
+<tr><td>März 2023</td><td class='num'>26.307</td><td class='num'>5.075</td><td class='num'>7.158</td><td class='num'>5.076</td><td class='num'>19,3 %</td><td class='num'>27,2 %</td><td class='num'>19,3 %</td></tr>
+<tr><td>Februar 2023</td><td class='num'>17.895</td><td class='num'>3.415</td><td class='num'>4.955</td><td class='num'>3.415</td><td class='num'>19,1 %</td><td class='num'>27,7 %</td><td class='num'>19,1 %</td></tr>
+<tr><td>Jänner 2023</td><td class='num'>18.850</td><td class='num'>2.745</td><td class='num'>4.961</td><td class='num'>2.746</td><td class='num'>14,6 %</td><td class='num'>26,3 %</td><td class='num'>14,6 %</td></tr>
+<tr><td>Dezember 2022</td><td class='num'>17.602</td><td class='num'>3.971</td><td class='num'>4.716</td><td class='num'>3.971</td><td class='num'>22,6 %</td><td class='num'>26,8 %</td><td class='num'>22,6 %</td></tr>
+<tr><td>November 2022</td><td class='num'>18.178</td><td class='num'>3.430</td><td class='num'>5.298</td><td class='num'>3.430</td><td class='num'>18,9 %</td><td class='num'>29,1 %</td><td class='num'>18,9 %</td></tr>
+<tr><td>Oktober 2022</td><td class='num'>16.061</td><td class='num'>2.660</td><td class='num'>4.188</td><td class='num'>2.660</td><td class='num'>16,6 %</td><td class='num'>26,1 %</td><td class='num'>16,6 %</td></tr>
+<tr><td>September 2022</td><td class='num'>20.735</td><td class='num'>4.554</td><td class='num'>4.703</td><td class='num'>4.554</td><td class='num'>22,0 %</td><td class='num'>22,7 %</td><td class='num'>22,0 %</td></tr>
+<tr><td>August 2022</td><td class='num'>17.814</td><td class='num'>2.639</td><td class='num'>4.317</td><td class='num'>2.639</td><td class='num'>14,8 %</td><td class='num'>24,2 %</td><td class='num'>14,8 %</td></tr>
+<tr><td>Juli 2022</td><td class='num'>16.054</td><td class='num'>2.418</td><td class='num'>3.708</td><td class='num'>2.421</td><td class='num'>15,1 %</td><td class='num'>23,1 %</td><td class='num'>15,1 %</td></tr>
+<tr><td>Juni 2022</td><td class='num'>22.760</td><td class='num'>3.414</td><td class='num'>5.163</td><td class='num'>3.414</td><td class='num'>15,0 %</td><td class='num'>22,7 %</td><td class='num'>15,0 %</td></tr>
+<tr><td>Mai 2022</td><td class='num'>17.107</td><td class='num'>2.064</td><td class='num'>4.628</td><td class='num'>2.064</td><td class='num'>12,1 %</td><td class='num'>27,1 %</td><td class='num'>12,1 %</td></tr>
+<tr><td>April 2022</td><td class='num'>16.364</td><td class='num'>1.849</td><td class='num'>4.497</td><td class='num'>1.849</td><td class='num'>11,3 %</td><td class='num'>27,5 %</td><td class='num'>11,3 %</td></tr>
+<tr><td>März 2022</td><td class='num'>20.653</td><td class='num'>3.039</td><td class='num'>4.988</td><td class='num'>3.049</td><td class='num'>14,7 %</td><td class='num'>24,2 %</td><td class='num'>14,8 %</td></tr>
+<tr><td>Februar 2022</td><td class='num'>16.103</td><td class='num'>2.114</td><td class='num'>4.164</td><td class='num'>2.115</td><td class='num'>13,1 %</td><td class='num'>25,9 %</td><td class='num'>13,1 %</td></tr>
+<tr><td>Jänner 2022</td><td class='num'>15.619</td><td class='num'>2.013</td><td class='num'>3.756</td><td class='num'>2.013</td><td class='num'>12,9 %</td><td class='num'>24,0 %</td><td class='num'>12,9 %</td></tr>
+<tr><td>Dezember 2021</td><td class='num'>17.648</td><td class='num'>3.411</td><td class='num'>4.104</td><td class='num'>3.415</td><td class='num'>19,3 %</td><td class='num'>23,3 %</td><td class='num'>19,4 %</td></tr>
+<tr><td>November 2021</td><td class='num'>17.519</td><td class='num'>3.498</td><td class='num'>4.043</td><td class='num'>3.498</td><td class='num'>20,0 %</td><td class='num'>23,1 %</td><td class='num'>20,0 %</td></tr>
+<tr><td>Oktober 2021</td><td class='num'>14.755</td><td class='num'>2.323</td><td class='num'>4.283</td><td class='num'>2.324</td><td class='num'>15,7 %</td><td class='num'>29,0 %</td><td class='num'>15,8 %</td></tr>
+<tr><td>September 2021</td><td class='num'>17.864</td><td class='num'>3.597</td><td class='num'>4.292</td><td class='num'>3.599</td><td class='num'>20,1 %</td><td class='num'>24,0 %</td><td class='num'>20,1 %</td></tr>
+<tr><td>August 2021</td><td class='num'>17.719</td><td class='num'>3.200</td><td class='num'>4.270</td><td class='num'>3.201</td><td class='num'>18,1 %</td><td class='num'>24,1 %</td><td class='num'>18,1 %</td></tr>
+<tr><td>Juli 2021</td><td class='num'>19.902</td><td class='num'>1.990</td><td class='num'>5.090</td><td class='num'>1.992</td><td class='num'>10,0 %</td><td class='num'>25,6 %</td><td class='num'>10,0 %</td></tr>
+<tr><td>Juni 2021</td><td class='num'>26.075</td><td class='num'>3.614</td><td class='num'>6.178</td><td class='num'>3.615</td><td class='num'>13,9 %</td><td class='num'>23,7 %</td><td class='num'>13,9 %</td></tr>
+<tr><td>Mai 2021</td><td class='num'>22.503</td><td class='num'>2.709</td><td class='num'>5.548</td><td class='num'>2.709</td><td class='num'>12,0 %</td><td class='num'>24,7 %</td><td class='num'>12,0 %</td></tr>
+<tr><td>April 2021</td><td class='num'>22.296</td><td class='num'>2.404</td><td class='num'>4.843</td><td class='num'>2.405</td><td class='num'>10,8 %</td><td class='num'>21,7 %</td><td class='num'>10,8 %</td></tr>
+<tr><td>März 2021</td><td class='num'>29.526</td><td class='num'>3.412</td><td class='num'>6.912</td><td class='num'>3.414</td><td class='num'>11,6 %</td><td class='num'>23,4 %</td><td class='num'>11,6 %</td></tr>
+<tr><td>Februar 2021</td><td class='num'>19.863</td><td class='num'>1.831</td><td class='num'>3.996</td><td class='num'>1.831</td><td class='num'>9,2 %</td><td class='num'>20,1 %</td><td class='num'>9,2 %</td></tr>
+<tr><td>Jänner 2021</td><td class='num'>14.133</td><td class='num'>1.377</td><td class='num'>3.037</td><td class='num'>1.377</td><td class='num'>9,7 %</td><td class='num'>21,5 %</td><td class='num'>9,7 %</td></tr>
+<tr><td>Dezember 2020</td><td class='num'>23.772</td><td class='num'>3.391</td><td class='num'>4.387</td><td class='num'>3.392</td><td class='num'>14,3 %</td><td class='num'>18,5 %</td><td class='num'>14,3 %</td></tr>
+<tr><td>November 2020</td><td class='num'>20.055</td><td class='num'>2.061</td><td class='num'>3.705</td><td class='num'>2.062</td><td class='num'>10,3 %</td><td class='num'>18,5 %</td><td class='num'>10,3 %</td></tr>
+<tr><td>Oktober 2020</td><td class='num'>24.274</td><td class='num'>1.578</td><td class='num'>4.409</td><td class='num'>1.583</td><td class='num'>6,5 %</td><td class='num'>18,2 %</td><td class='num'>6,5 %</td></tr>
+<tr><td>September 2020</td><td class='num'>22.162</td><td class='num'>1.946</td><td class='num'>3.093</td><td class='num'>1.946</td><td class='num'>8,8 %</td><td class='num'>14,0 %</td><td class='num'>8,8 %</td></tr>
+<tr><td>August 2020</td><td class='num'>20.906</td><td class='num'>1.127</td><td class='num'>2.747</td><td class='num'>1.127</td><td class='num'>5,4 %</td><td class='num'>13,1 %</td><td class='num'>5,4 %</td></tr>
+<tr><td>Juli 2020</td><td class='num'>24.784</td><td class='num'>1.064</td><td class='num'>3.227</td><td class='num'>1.064</td><td class='num'>4,3 %</td><td class='num'>13,0 %</td><td class='num'>4,3 %</td></tr>
+<tr><td>Juni 2020</td><td class='num'>26.676</td><td class='num'>1.085</td><td class='num'>3.014</td><td class='num'>1.085</td><td class='num'>4,1 %</td><td class='num'>11,3 %</td><td class='num'>4,1 %</td></tr>
+<tr><td>Mai 2020</td><td class='num'>20.211</td><td class='num'>735</td><td class='num'>2.359</td><td class='num'>735</td><td class='num'>3,6 %</td><td class='num'>11,7 %</td><td class='num'>3,6 %</td></tr>
+<tr><td>April 2020</td><td class='num'>11.220</td><td class='num'>557</td><td class='num'>1.125</td><td class='num'>558</td><td class='num'>5,0 %</td><td class='num'>10,0 %</td><td class='num'>5,0 %</td></tr>
+<tr><td>März 2020</td><td class='num'>10.654</td><td class='num'>752</td><td class='num'>1.296</td><td class='num'>754</td><td class='num'>7,1 %</td><td class='num'>12,2 %</td><td class='num'>7,1 %</td></tr>
+<tr><td>Februar 2020</td><td class='num'>21.067</td><td class='num'>981</td><td class='num'>2.060</td><td class='num'>984</td><td class='num'>4,7 %</td><td class='num'>9,8 %</td><td class='num'>4,7 %</td></tr>
+<tr><td>Jänner 2020</td><td class='num'>22.959</td><td class='num'>695</td><td class='num'>2.245</td><td class='num'>696</td><td class='num'>3,0 %</td><td class='num'>9,8 %</td><td class='num'>3,0 %</td></tr>
+<tr><td>Dezember 2019</td><td class='num'>22.682</td><td class='num'>691</td><td class='num'>1.822</td><td class='num'>691</td><td class='num'>3,0 %</td><td class='num'>8,0 %</td><td class='num'>3,0 %</td></tr>
+<tr><td>November 2019</td><td class='num'>23.271</td><td class='num'>653</td><td class='num'>1.760</td><td class='num'>654</td><td class='num'>2,8 %</td><td class='num'>7,6 %</td><td class='num'>2,8 %</td></tr>
+<tr><td>Oktober 2019</td><td class='num'>25.138</td><td class='num'>515</td><td class='num'>1.851</td><td class='num'>519</td><td class='num'>2,0 %</td><td class='num'>7,4 %</td><td class='num'>2,1 %</td></tr>
+<tr><td>September 2019</td><td class='num'>21.047</td><td class='num'>969</td><td class='num'>1.373</td><td class='num'>970</td><td class='num'>4,6 %</td><td class='num'>6,5 %</td><td class='num'>4,6 %</td></tr>
+<tr><td>August 2019</td><td class='num'>29.888</td><td class='num'>799</td><td class='num'>1.490</td><td class='num'>800</td><td class='num'>2,7 %</td><td class='num'>5,0 %</td><td class='num'>2,7 %</td></tr>
+<tr><td>Juli 2019</td><td class='num'>31.428</td><td class='num'>711</td><td class='num'>1.315</td><td class='num'>714</td><td class='num'>2,3 %</td><td class='num'>4,2 %</td><td class='num'>2,3 %</td></tr>
+<tr><td>Juni 2019</td><td class='num'>32.529</td><td class='num'>939</td><td class='num'>1.329</td><td class='num'>941</td><td class='num'>2,9 %</td><td class='num'>4,1 %</td><td class='num'>2,9 %</td></tr>
+<tr><td>Mai 2019</td><td class='num'>30.574</td><td class='num'>699</td><td class='num'>1.350</td><td class='num'>700</td><td class='num'>2,3 %</td><td class='num'>4,4 %</td><td class='num'>2,3 %</td></tr>
+<tr><td>April 2019</td><td class='num'>31.951</td><td class='num'>724</td><td class='num'>1.469</td><td class='num'>725</td><td class='num'>2,3 %</td><td class='num'>4,6 %</td><td class='num'>2,3 %</td></tr>
+<tr><td>März 2019</td><td class='num'>31.958</td><td class='num'>1.344</td><td class='num'>1.260</td><td class='num'>1.346</td><td class='num'>4,2 %</td><td class='num'>3,9 %</td><td class='num'>4,2 %</td></tr>
+<tr><td>Februar 2019</td><td class='num'>23.640</td><td class='num'>691</td><td class='num'>744</td><td class='num'>692</td><td class='num'>2,9 %</td><td class='num'>3,1 %</td><td class='num'>2,9 %</td></tr>
+<tr><td>Jänner 2019</td><td class='num'>25.257</td><td class='num'>507</td><td class='num'>742</td><td class='num'>509</td><td class='num'>2,0 %</td><td class='num'>2,9 %</td><td class='num'>2,0 %</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Info -->
+    <section id="info" class="panel info">
+      <div class="plain-header">
+        <h2>Elektromobilität: Ziele und Neuzulassungen</h2>
+        <span class="brand">Klimadashboard.at<svg class="logo" viewBox="0 0 100 100" width="26" height="26" aria-hidden="true"><defs><linearGradient id="kg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#57C98C"/><stop offset="1" stop-color="#2BA77A"/></linearGradient></defs><rect x="4" y="4" width="92" height="92" rx="20" fill="url(#kg)"/><rect x="22" y="32" width="20" height="38" rx="6" fill="#EAF7EF" opacity="0.95"/><polyline points="60,32 40,51 60,70" fill="none" stroke="#EAF7EF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/><polyline points="80,32 60,51 80,70" fill="none" stroke="#EAF7EF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg></span>
+      </div>
+      <div class="body tight">
+        <p>Mit dem Mobilitätsmasterplan 2030 hat Österreich den Rahmen gesetzt, den Verkehr
+           schrittweise auf klimafreundliche Antriebe umzustellen. Ein zentraler Baustein ist die
+           Umstellung der PKW-Neuzulassungen auf emissionsfreie Fahrzeuge — also rein
+           batterieelektrische Autos und Wasserstoff-Brennstoffzellenfahrzeuge. Auf EU-Ebene kommt
+           hinzu, dass ab 2035 keine neuen PKW mit reinem Verbrennungsmotor mehr zugelassen werden
+           dürfen.</p>
+
+        <p>Die durchgezogene orange Linie zeigt den monatlich beobachteten Anteil emissionsfreier PKW
+           an allen Neuzulassungen in Österreich seit Jänner 2019. Der Punkt am Ende markiert den
+           zuletzt verfügbaren Monat — im <b>Mai 2026</b> waren <b>25,8 %</b> der
+           Neuzulassungen emissionsfrei. Die beiden gestrichelten Linien sind gedachte, lineare
+           Zielpfade: Sie starten beim Durchschnittswert des Jahres 2020 und steigen auf 100 %. Das
+           AT-Ziel ist auf Ende 2030 ausgerichtet, das EU-Ziel auf Ende 2035.</p>
+
+        <p>Der Anteil emissionsfreier Neuzulassungen ist seit 2019 deutlich gestiegen, liegt aber noch
+           klar unter dem Pfad, der für das AT-Ziel 2030 nötig wäre. Damit die Ziele erreichbar
+           bleiben, müsste sich der Hochlauf in den nächsten Jahren spürbar beschleunigen — etwa durch
+           Kaufanreize, den Ausbau der Ladeinfrastruktur und ein größeres Angebot leistbarer Modelle.</p>
+
+        <div class="methodik">
+          <h3>Datenhinweise und Methodik</h3>
+          <p>Datengrundlage sind die monatlichen KFZ-Neuzulassungen der Statistik Austria, gefiltert
+             auf Personenkraftwagen (Klasse M1) für Gesamtösterreich. Als emissionsfrei gelten rein
+             elektrische Fahrzeuge und Wasserstoff-Brennstoffzellenfahrzeuge; Hybride (Benzin/Elektro,
+             Diesel/Elektro) zählen nicht dazu. Der Anteil emissionsfrei ergibt sich aus den
+             emissionsfreien Zulassungen geteilt durch alle Neuzulassungen des jeweiligen Monats. Jeder
+             Monatswert durchläuft vor der Darstellung automatische Plausibilitätsprüfungen. Die
+             Zielpfade sind lineare Referenzlinien zur Einordnung und keine Prognose.</p>
+          <table class="src-table">
+            <thead>
+              <tr><th>Datensatz</th><th>Datenquelle</th><th>Aktualisierung</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>PKW-Neuzulassungen nach Kraftstoffart</td><td>Statistik Austria</td><td>Monatlich</td></tr>
+              <tr><td>AT-Ziel 2030</td><td>Österreichischer Mobilitätsmasterplan 2030</td><td>—</td></tr>
+              <tr><td>EU-Ziel 2035</td><td>EU-Flottengrenzwerte (VO (EU) 2019/631)</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom toggle bar -->
+    <div class="toolbar">
+      <div class="toolbar-left" role="tablist">
+        <button class="tab" role="tab" aria-selected="true"  data-target="grafik"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="20" x2="6" y2="13"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="10"/></svg>Grafik</button>
+        <button class="tab" role="tab" aria-selected="false" data-target="tabelle"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="1.5"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="4" x2="9" y2="20"/></svg>Tabelle</button>
+        <button class="tab" role="tab" aria-selected="false" data-target="info"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><polyline points="14 3 14 8 19 8"/><line x1="8.5" y1="13" x2="15.5" y2="13"/><line x1="8.5" y1="17" x2="13.5" y2="17"/></svg>Info</button>
+      </div>
+      <div class="toolbar-right">
+        <a title="Link kopieren"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></a>
+        <a title="Einbetten"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 8 5 12 9 16"/><polyline points="15 8 19 12 15 16"/></svg></a>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(t => t.setAttribute('aria-selected', t === tab));
+    panels.forEach(p => p.classList.toggle('active', p.id === tab.dataset.target));
+  }));
+</script>
+</body>
+</html>
