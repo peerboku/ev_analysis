@@ -152,11 +152,11 @@ def style_kd_axis(ax):
     ax.spines["bottom"].set_alpha(0.4)
 
     # Positions values of axis label (f.ex. 20%, 40 %)
-    ax.tick_params(axis="x", colors=KD_MUTED, direction="in", length=6, pad=-6)
+    ax.tick_params(axis="x", colors=KD_MUTED, direction="out", length=6, pad=4)
     ax.tick_params(axis="y", colors=KD_MUTED, length=0, pad=-6)
 
     for label in ax.get_xticklabels():
-        label.set_verticalalignment("bottom")
+        label.set_verticalalignment("top")
 
     for label in ax.get_yticklabels():
         label.set_horizontalalignment("left")
