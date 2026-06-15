@@ -50,7 +50,7 @@
 
 ### Priority 1 — Repo cleanup (do first, everything depends on it)
 
-- [ ] **Renumber and rename all scripts** in `scripts/`
+- [x] **Renumber and rename all scripts** in `scripts/`
   - `00_inspect_raw_data.py` → delete
   - `01_download_data.py` → keep, rename if clearer
   - `02_process_raw_data.py` → integrate historical data processing here (skip if already processed)
